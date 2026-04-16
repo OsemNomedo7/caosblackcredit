@@ -124,33 +124,8 @@ export default function LandingPage() {
       <section className="relative z-10 min-h-screen flex flex-col justify-between px-4 pt-20" style={{ background: c.heroBg || 'transparent', position: 'relative', overflow: 'hidden' }}>
         <BannerOverlay bKey="hero" opacityKey="heroBgOpacity" fit="cover" />
 
-        {/* Título / conteúdo central do hero */}
-        <div className="flex-1 flex items-center justify-center" style={{ position: 'relative', zIndex: 1 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <motion.h1
-              className="text-5xl md:text-7xl font-black font-display leading-tight mb-6"
-              style={{ color: c.textoTitulo || '#111827' }}
-            >
-              {cfg.hero?.titulo || (
-                <>Seu cartão de crédito,{' '}<span className="gradient-text">sem burocracia</span></>
-              )}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.28 }}
-              className="text-lg md:text-xl max-w-xl mx-auto"
-              style={{ color: c.textoCorpo || '#6b7280' }}
-            >
-              {cfg.hero?.subtitulo || 'Aprovação rápida, limite garantido e sem consulta ao SPC/Serasa.'}
-            </motion.p>
-          </motion.div>
-        </div>
+        {/* Espaço livre para o banner do admin aparecer */}
+        <div className="flex-1" />
 
         {/* Rodapé do hero: prova social + CTAs + trust badges */}
         <div className="pb-14" style={{ position: 'relative', zIndex: 1 }}>
