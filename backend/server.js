@@ -15,6 +15,10 @@ const app = express();
 const server = http.createServer(app);
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Aceita qualquer origem HTTPS ou localhost (funciona com qualquer domínio apontado)
+const isAllowedOrigin = (origin) =>
+  !origin || origin.startsWith('https://') || origin.includes('localhost');
 const JWT_SECRET = process.env.JWT_SECRET || 'projetocredito_secret_2024';
 const PORT = process.env.PORT || 3001;
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'database.bin');
@@ -48,7 +52,11 @@ const upload = multer({
 });
 
 const io = new Server(server, {
-  cors: { origin: FRONTEND_URL, methods: ['GET', 'POST', 'PUT', 'DELETE'], credentials: true }
+  cors: {
+    origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
 });
 
 // ─── DATABASE (sql.js) ───────────────────────────────────────────────────────
@@ -328,7 +336,10 @@ function getSettings() {
 }
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
+  credentials: true,
+}));
 app.use(express.json({ limit: '2mb' }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
