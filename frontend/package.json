@@ -1,0 +1,27 @@
+{
+  "name": "projetocredito-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node ../sync-assets.js 2>/dev/null || true",
+    "prebuild": "node ../sync-assets.js 2>/dev/null || true",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "framer-motion": "^10.16.16",
+    "socket.io-client": "^4.6.1",
+    "axios": "^1.6.2",
+    "lucide-react": "^0.303.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.16",
+    "@types/node": "^20.0.0"
+  }
+}
