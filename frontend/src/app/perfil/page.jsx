@@ -78,11 +78,11 @@ export default function PerfilPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between p-6"
+        className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-6"
       >
         <button
           onClick={() => router.push('/')}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 transition-colors text-sm"
         >
           ← Voltar
         </button>
@@ -90,18 +90,18 @@ export default function PerfilPage() {
         <BrandLogo />
 
         {/* Etapas */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`w-2 h-2 rounded-full transition-all ${s === 1 ? 'bg-brand-400 w-6' : 'bg-white/20'}`}
+              className={`h-2 rounded-full transition-all ${s === 1 ? 'bg-brand-400 w-5' : 'bg-white/20 w-2'}`}
             />
           ))}
         </div>
       </motion.div>
 
       {/* Conteúdo principal */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,7 +109,7 @@ export default function PerfilPage() {
           className="w-full max-w-2xl"
         >
           {/* Título */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-6 sm:mb-10">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -141,7 +141,7 @@ export default function PerfilPage() {
                 onHoverEnd={() => setHovered(null)}
                 onClick={() => handleSelect(profile.id)}
                 className={`
-                  relative overflow-hidden rounded-2xl p-7 text-left border transition-all duration-300 cursor-pointer
+                  relative overflow-hidden rounded-2xl p-5 sm:p-7 text-left border transition-all duration-300 cursor-pointer
                   ${selected === profile.id ? 'border-brand-400/80' : 'border-white/10'}
                   ${profile.borderHover}
                   bg-gradient-to-br ${profile.color}

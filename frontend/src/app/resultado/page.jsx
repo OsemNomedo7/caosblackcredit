@@ -73,18 +73,18 @@ export default function ResultadoPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between p-6"
+        className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-6"
       >
         <div />
         <BrandLogo />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4].map((s) => (
-            <div key={s} className={`h-2 rounded-full ${s <= 3 ? 'bg-brand-400' : 'bg-white/20'} ${s === 3 ? 'w-6' : 'w-2'}`} />
+            <div key={s} className={`h-2 rounded-full ${s <= 3 ? 'bg-brand-400' : 'bg-white/20'} ${s === 3 ? 'w-5' : 'w-2'}`} />
           ))}
         </div>
       </motion.div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-8">
         <div className="w-full max-w-lg">
 
           {/* Badge de aprovação */}
@@ -135,7 +135,7 @@ export default function ResultadoPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="glass-dark rounded-3xl p-8 mb-6"
+            className="glass-dark rounded-3xl p-5 sm:p-8 mb-6"
           >
             {/* Score Gauge */}
             <div className="flex justify-center mb-8">

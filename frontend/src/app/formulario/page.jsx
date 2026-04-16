@@ -113,22 +113,22 @@ export default function FormularioPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between p-6"
+        className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-6"
       >
         <button
           onClick={() => router.push('/perfil')}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 transition-colors text-sm"
         >
           ← Voltar
         </button>
 
         <BrandLogo />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`h-2 rounded-full transition-all ${s <= 2 ? 'bg-brand-400' : 'bg-white/20'} ${s === 2 ? 'w-6' : 'w-2'}`}
+              className={`h-2 rounded-full transition-all ${s <= 2 ? 'bg-brand-400' : 'bg-white/20'} ${s === 2 ? 'w-5' : 'w-2'}`}
             />
           ))}
         </div>

@@ -78,7 +78,7 @@ export default function ConfirmacaoPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-center p-6"
+        className="relative z-10 flex items-center justify-center px-4 py-4 sm:px-6 sm:py-6"
       >
         <BrandLogo />
       </motion.div>

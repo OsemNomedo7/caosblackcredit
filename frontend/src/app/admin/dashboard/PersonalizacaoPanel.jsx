@@ -599,8 +599,15 @@ export default function PersonalizacaoPanel() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <Section title="Hero — Banner de fundo" icon="🏠">
-                  <BannerBlock label="Imagem de fundo do hero" urlKey="hero" opacityKey="heroBgOpacity"
+                  <BannerBlock label="Imagem de fundo do hero (Desktop 16:9)" urlKey="hero" opacityKey="heroBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
+                  <div style={{ marginTop: 16 }}>
+                    <BannerBlock label="Imagem de fundo do hero (Mobile 9:16) — opcional" urlKey="heroMobile" opacityKey="heroBgOpacity"
+                      values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
+                    <p style={{ color: 'rgba(200,180,255,0.4)', fontSize: 11, marginTop: 4 }}>
+                      Se não configurado, o banner desktop é usado em telas pequenas também.
+                    </p>
+                  </div>
                 </Section>
 
                 <Section title="Navbar — Logo" icon="📌">

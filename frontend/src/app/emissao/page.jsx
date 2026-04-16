@@ -94,7 +94,7 @@ export default function EmissaoPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between p-6"
+        className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-6"
       >
         <button
           onClick={() => router.push('/endereco')}
@@ -103,14 +103,14 @@ export default function EmissaoPage() {
           ← Voltar
         </button>
         <BrandLogo />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4].map((s) => (
-            <div key={s} className={`h-2 rounded-full bg-brand-400 ${s === 4 ? 'w-6' : 'w-2'}`} />
+            <div key={s} className={`h-2 rounded-full bg-brand-400 ${s === 4 ? 'w-5' : 'w-2'}`} />
           ))}
         </div>
       </motion.div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-8">
         <div className="w-full max-w-lg">
 
           {/* Título */}
@@ -137,7 +137,7 @@ export default function EmissaoPage() {
             style={{ perspective: 1000 }}
           >
             <div
-              className="relative rounded-3xl p-6 overflow-hidden"
+              className="relative rounded-3xl p-5 sm:p-6 overflow-hidden"
               style={{
                 background: `linear-gradient(135deg, ${cfg.cores?.cartaoCorInicio || '#820AD1'} 0%, ${cfg.cores?.cartaoCorMeio || '#4b047d'} 50%, ${cfg.cores?.cartaoCorFim || '#23023c'} 100%)`,
                 border: '1px solid rgba(130,10,209,0.5)',
@@ -167,7 +167,7 @@ export default function EmissaoPage() {
                 </div>
               </div>
 
-              <p className="text-white font-mono text-xl tracking-[0.2em] mb-6">
+              <p className="text-white font-mono text-base sm:text-xl tracking-[0.12em] sm:tracking-[0.2em] mb-6">
                 •••• •••• •••• ****
               </p>
 
@@ -196,8 +196,8 @@ export default function EmissaoPage() {
             <h3 className="text-gray-900 font-bold mb-4">Resumo do pedido</h3>
             <div className="space-y-3">
               {[
-                { label: 'Taxa de personalização e emissão', value: `R$ ${pix?.emission_fee?.toFixed(2) || '19,90'}`, desc: 'Personalização do cartão com seu nome' },
-                { label: 'Frete e entrega com rastreio', value: `R$ ${pix?.shipping_fee?.toFixed(2) || '29,90'}`, desc: 'Envio via Correios com código de rastreamento' },
+                { label: 'Taxa de emissão', value: `R$ ${pix?.emission_fee?.toFixed(2) || '19,90'}`, desc: 'Personalização do cartão com seu nome' },
+                { label: 'Frete com rastreio', value: `R$ ${pix?.shipping_fee?.toFixed(2) || '29,90'}`, desc: 'Envio via Correios com código de rastreamento' },
               ].map((item, i) => (
                 <div key={i}>
                   <div className="flex justify-between items-center">

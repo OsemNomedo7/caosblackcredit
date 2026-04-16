@@ -168,11 +168,11 @@ export default function EnderecoPage() {
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between p-6"
+        className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-6"
       >
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-sm"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 transition-colors text-sm"
         >
           ← Voltar
         </button>
@@ -180,18 +180,18 @@ export default function EnderecoPage() {
         <BrandLogo />
 
         {/* Etapas */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`h-2 rounded-full transition-all ${s <= 3 ? 'bg-brand-400' : 'bg-gray-200'} ${s === 3 ? 'w-6' : 'w-2'}`}
+              className={`h-2 rounded-full transition-all ${s <= 3 ? 'bg-brand-400' : 'bg-gray-200'} ${s === 3 ? 'w-5' : 'w-2'}`}
             />
           ))}
         </div>
       </motion.div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}

@@ -66,17 +66,20 @@ export default function LandingPage() {
   // Overlay de fundo para seções
   // fit='cover' → preenche a seção inteira (padrão para fundos de seção)
   // fit='contain' → mostra a imagem inteira sem cortar nem esticar (para o hero)
-  const BannerOverlay = ({ bKey, opacityKey, fit = 'cover' }) => {
+  const BannerOverlay = ({ bKey, opacityKey, fit = 'cover', wrapperClass = '' }) => {
     const url = cfg.banners?.[bKey];
     if (!url) return null;
     const opacity = parseFloat(cfg.banners?.[opacityKey] || '0.15');
     return (
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
-        backgroundImage: `url(${url})`,
-        backgroundSize: fit, backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-        opacity,
-      }} />
+      <div
+        className={wrapperClass || undefined}
+        style={{
+          position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+          backgroundImage: `url(${url})`,
+          backgroundSize: fit, backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
+          opacity,
+        }}
+      />
     );
   };
 
@@ -93,7 +96,7 @@ export default function LandingPage() {
       <motion.nav
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-30 px-6 py-4"
+        className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 sm:py-4"
         style={{ background: c.navbarBg || '#820AD1', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${c.navbarBorda || 'rgba(130,10,209,0.8)'}` }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -113,7 +116,7 @@ export default function LandingPage() {
             onClick={handleCTA}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="btn-primary text-sm px-6 py-3 rounded-xl"
+            className="btn-primary text-sm px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl whitespace-nowrap"
           >
             Solicitar Agora
           </motion.button>
@@ -122,7 +125,13 @@ export default function LandingPage() {
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <section className="relative z-10 min-h-screen flex flex-col justify-between px-4 pt-20" style={{ background: c.heroBg || 'transparent', position: 'relative', overflow: 'hidden' }}>
-        <BannerOverlay bKey="hero" opacityKey="heroBgOpacity" fit="cover" />
+        {/* Banner desktop (oculto em mobile se banner mobile estiver configurado) */}
+        <BannerOverlay bKey="hero" opacityKey="heroBgOpacity" fit="cover"
+          wrapperClass={cfg.banners?.heroMobile ? 'hidden sm:block' : ''} />
+        {/* Banner mobile (só aparece se configurado; cobre apenas telas < sm) */}
+        {cfg.banners?.heroMobile && (
+          <BannerOverlay bKey="heroMobile" opacityKey="heroBgOpacity" fit="cover" wrapperClass="sm:hidden" />
+        )}
 
         {/* Espaço livre para o banner do admin aparecer */}
         <div className="flex-1" />
@@ -191,7 +200,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CARTÃO FLUTUANTE (bridge hero → benefícios) ─────────── */}
-      <section className="relative z-10 py-16 px-4 flex justify-center" style={{ background: c.heroBg || 'transparent' }}>
+      <section className="relative z-10 py-10 px-4 flex justify-center" style={{ background: c.heroBg || 'transparent' }}>
         <motion.div
           initial={{ opacity: 0, y: 40, rotateX: -12, rotateY: 6 }}
           whileInView={{ opacity: 1, y: 0, rotateX: -6, rotateY: 3 }}
@@ -203,9 +212,8 @@ export default function LandingPage() {
             whileHover={{ rotateX: 0, rotateY: 0, scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             onClick={handleCTA}
-            className="relative rounded-3xl overflow-hidden cursor-pointer"
+            className="relative rounded-3xl overflow-hidden cursor-pointer w-[300px] sm:w-[320px]"
             style={{
-              width: 320,
               background: `linear-gradient(135deg, ${c.cartaoCorInicio || '#820AD1'} 0%, ${c.cartaoCorMeio || '#4b047d'} 50%, ${c.cartaoCorFim || '#23023c'} 100%)`,
               border: '1px solid rgba(255,255,255,0.12)',
               boxShadow: `0 40px 100px ${c.cartaoCorInicio || '#820AD1'}55, 0 12px 30px rgba(0,0,0,0.25)`,
