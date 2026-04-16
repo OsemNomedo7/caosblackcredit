@@ -111,7 +111,12 @@ async function initDB() {
   if (!adminRows.length || !adminRows[0].values.length) {
     const hashed = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);
     db.run('INSERT INTO admin_users (username, password) VALUES (?, ?)', ['admin', hashed]);
-    console.log('✅ Admin criado: admin / admin123');
+    console.log('✅ Admin criado');
+  } else if (process.env.ADMIN_PASSWORD) {
+    // Sempre atualiza a senha se a variável de ambiente estiver definida
+    const hashed = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+    db.run("UPDATE admin_users SET password = ? WHERE username = 'admin'", [hashed]);
+    console.log('🔑 Senha do admin sincronizada com ADMIN_PASSWORD');
   }
 
   // Configurações padrão
