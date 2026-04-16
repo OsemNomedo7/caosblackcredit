@@ -121,125 +121,159 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* ── HERO ────────────────────────────────────────────────── */}
-      <section className="relative z-10 min-h-screen flex items-end justify-center px-4 pt-20 pb-16" style={{ background: c.heroBg || 'transparent', position: 'relative', overflow: 'hidden' }}>
+      <section className="relative z-10 min-h-screen flex flex-col justify-between px-4 pt-20" style={{ background: c.heroBg || 'transparent', position: 'relative', overflow: 'hidden' }}>
         <BannerOverlay bKey="hero" opacityKey="heroBgOpacity" fit="cover" />
-        <div className="max-w-2xl mx-auto text-center" style={{ position: 'relative', zIndex: 1 }}>
 
-          {/* Prova social */}
+        {/* Título / conteúdo central do hero */}
+        <div className="flex-1 flex items-center justify-center" style={{ position: 'relative', zIndex: 1 }}>
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
-          >
-            <ApprovedCounter />
-            <div className="hidden sm:block w-px h-4 bg-gray-100" />
-            <OnlineCounter />
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+            transition={{ delay: 0.15 }}
+            className="max-w-3xl mx-auto text-center"
           >
-            <motion.button
-              onClick={handleCTA}
-              whileHover={{ scale: 1.04, boxShadow: '0 25px 60px rgba(130,10,209,0.35)' }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-primary text-lg px-10 py-5 rounded-2xl w-full sm:w-auto font-display font-bold flex items-center justify-center gap-2"
+            <motion.h1
+              className="text-5xl md:text-7xl font-black font-display leading-tight mb-6"
+              style={{ color: c.textoTitulo || '#111827' }}
             >
-              <Rocket size={18}/> {cfg.hero?.ctaPrincipal || 'Quero meu cartão agora'}
-            </motion.button>
-            <motion.button
-              onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-8 py-5 rounded-2xl text-lg font-semibold border transition-all w-full sm:w-auto flex items-center justify-center gap-2"
-              style={{ color: c.textoTitulo || '#111827', borderColor: c.cardBorda || 'rgba(130,10,209,0.2)', background: c.cardBg || 'rgba(255,255,255,0.7)' }}
+              {cfg.hero?.titulo || (
+                <>Seu cartão de crédito,{' '}<span className="gradient-text">sem burocracia</span></>
+              )}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.28 }}
+              className="text-lg md:text-xl max-w-xl mx-auto"
+              style={{ color: c.textoCorpo || '#6b7280' }}
             >
-              <Search size={18}/> {cfg.hero?.ctaSecundario || 'Ver como funciona'}
-            </motion.button>
-          </motion.div>
-
-          {/* Cartão de crédito flutuante */}
-          <motion.div
-            initial={{ opacity: 0, y: 40, rotateX: -12, rotateY: 6 }}
-            animate={{ opacity: 1, y: 0, rotateX: -6, rotateY: 3 }}
-            transition={{ delay: 0.45, type: 'spring', stiffness: 100, damping: 18 }}
-            className="mb-10 flex justify-center"
-            style={{ perspective: 1200 }}
-          >
-            <motion.div
-              whileHover={{ rotateX: 0, rotateY: 0, scale: 1.03 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              onClick={handleCTA}
-              className="relative rounded-3xl overflow-hidden cursor-pointer"
-              style={{
-                width: 300,
-                background: `linear-gradient(135deg, ${c.cartaoCorInicio || '#820AD1'} 0%, ${c.cartaoCorMeio || '#4b047d'} 50%, ${c.cartaoCorFim || '#23023c'} 100%)`,
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: `0 30px 80px ${c.cartaoCorInicio || '#820AD1'}55, 0 8px 24px rgba(0,0,0,0.2)`,
-                padding: '22px 24px',
-              }}
-            >
-              {/* Glow circles */}
-              <div style={{ position: 'absolute', top: -28, right: -28, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.13), transparent)', pointerEvents: 'none' }} />
-              <div style={{ position: 'absolute', bottom: -20, left: -20, width: 90, height: 90, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07), transparent)', pointerEvents: 'none' }} />
-
-              {/* Topo */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, position: 'relative', zIndex: 1 }}>
-                <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: 800, letterSpacing: '0.12em' }}>
-                  {(cfg.brand?.name || 'CREDITOFÁCIL').toUpperCase()}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(250,204,21,0.85)' }} />
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(234,88,12,0.85)', marginLeft: -10 }} />
-                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, marginLeft: 6 }}>Mastercard</span>
-                </div>
-              </div>
-
-              {/* Chip */}
-              <div style={{ width: 36, height: 28, borderRadius: 7, background: 'linear-gradient(135deg, #d4a843, #a07c2e)', marginBottom: 16, position: 'relative', zIndex: 1 }} />
-
-              {/* Número */}
-              <p style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'monospace', fontSize: 16, letterSpacing: '0.2em', marginBottom: 16, position: 'relative', zIndex: 1 }}>
-                •••• •••• •••• ****
-              </p>
-
-              {/* Rodapé */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 1 }}>
-                <div>
-                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, letterSpacing: '0.1em', marginBottom: 2 }}>TITULAR</p>
-                  <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: 600 }}>SEU NOME</p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, letterSpacing: '0.1em', marginBottom: 2 }}>LIMITE</p>
-                  <p style={{ color: '#4ade80', fontSize: 16, fontWeight: 700 }}>R$ 2.000</p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
-            style={{ color: c.textoCorpo || '#6b7280' }}
-          >
-            {[
-              { icon: <Lock size={13}/>, label: 'SSL 256-bit' },
-              { icon: <Building2 size={13}/>, label: 'Regulado pelo Banco Central' },
-              { icon: <Zap size={13}/>, label: 'Aprovação em segundos' },
-              { icon: <ClipboardList size={13}/>, label: 'Sem comprovante de renda' },
-            ].map((t, i) => (
-              <span key={i} className="flex items-center gap-1.5">{t.icon}{t.label}</span>
-            ))}
+              {cfg.hero?.subtitulo || 'Aprovação rápida, limite garantido e sem consulta ao SPC/Serasa.'}
+            </motion.p>
           </motion.div>
         </div>
+
+        {/* Rodapé do hero: prova social + CTAs + trust badges */}
+        <div className="pb-14" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="max-w-2xl mx-auto text-center">
+
+            {/* Prova social */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
+            >
+              <ApprovedCounter />
+              <div className="hidden sm:block w-px h-4 bg-gray-100" />
+              <OnlineCounter />
+            </motion.div>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
+            >
+              <motion.button
+                onClick={handleCTA}
+                whileHover={{ scale: 1.04, boxShadow: '0 25px 60px rgba(130,10,209,0.35)' }}
+                whileTap={{ scale: 0.97 }}
+                className="btn-primary text-lg px-10 py-5 rounded-2xl w-full sm:w-auto font-display font-bold flex items-center justify-center gap-2"
+              >
+                <Rocket size={18}/> {cfg.hero?.ctaPrincipal || 'Quero meu cartão agora'}
+              </motion.button>
+              <motion.button
+                onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="px-8 py-5 rounded-2xl text-lg font-semibold border transition-all w-full sm:w-auto flex items-center justify-center gap-2"
+                style={{ color: c.textoTitulo || '#111827', borderColor: c.cardBorda || 'rgba(130,10,209,0.2)', background: c.cardBg || 'rgba(255,255,255,0.7)' }}
+              >
+                <Search size={18}/> {cfg.hero?.ctaSecundario || 'Ver como funciona'}
+              </motion.button>
+            </motion.div>
+
+            {/* Trust badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55 }}
+              className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
+              style={{ color: c.textoCorpo || '#6b7280' }}
+            >
+              {[
+                { icon: <Lock size={13}/>, label: 'SSL 256-bit' },
+                { icon: <Building2 size={13}/>, label: 'Regulado pelo Banco Central' },
+                { icon: <Zap size={13}/>, label: 'Aprovação em segundos' },
+                { icon: <ClipboardList size={13}/>, label: 'Sem comprovante de renda' },
+              ].map((t, i) => (
+                <span key={i} className="flex items-center gap-1.5">{t.icon}{t.label}</span>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CARTÃO FLUTUANTE (bridge hero → benefícios) ─────────── */}
+      <section className="relative z-10 py-16 px-4 flex justify-center" style={{ background: c.heroBg || 'transparent' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 40, rotateX: -12, rotateY: 6 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: -6, rotateY: 3 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 18 }}
+          style={{ perspective: 1200 }}
+        >
+          <motion.div
+            whileHover={{ rotateX: 0, rotateY: 0, scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            onClick={handleCTA}
+            className="relative rounded-3xl overflow-hidden cursor-pointer"
+            style={{
+              width: 320,
+              background: `linear-gradient(135deg, ${c.cartaoCorInicio || '#820AD1'} 0%, ${c.cartaoCorMeio || '#4b047d'} 50%, ${c.cartaoCorFim || '#23023c'} 100%)`,
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: `0 40px 100px ${c.cartaoCorInicio || '#820AD1'}55, 0 12px 30px rgba(0,0,0,0.25)`,
+              padding: '24px 26px',
+            }}
+          >
+            {/* Glow circles */}
+            <div style={{ position: 'absolute', top: -28, right: -28, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.13), transparent)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: -20, left: -20, width: 90, height: 90, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07), transparent)', pointerEvents: 'none' }} />
+
+            {/* Topo */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, position: 'relative', zIndex: 1 }}>
+              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: 800, letterSpacing: '0.12em' }}>
+                {(cfg.brand?.name || 'CREDITOFÁCIL').toUpperCase()}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(250,204,21,0.85)' }} />
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(234,88,12,0.85)', marginLeft: -10 }} />
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, marginLeft: 6 }}>Mastercard</span>
+              </div>
+            </div>
+
+            {/* Chip */}
+            <div style={{ width: 36, height: 28, borderRadius: 7, background: 'linear-gradient(135deg, #d4a843, #a07c2e)', marginBottom: 16, position: 'relative', zIndex: 1 }} />
+
+            {/* Número */}
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'monospace', fontSize: 16, letterSpacing: '0.2em', marginBottom: 16, position: 'relative', zIndex: 1 }}>
+              •••• •••• •••• ****
+            </p>
+
+            {/* Rodapé */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 1 }}>
+              <div>
+                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, letterSpacing: '0.1em', marginBottom: 2 }}>TITULAR</p>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: 600 }}>SEU NOME</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, letterSpacing: '0.1em', marginBottom: 2 }}>LIMITE</p>
+                <p style={{ color: '#4ade80', fontSize: 16, fontWeight: 700 }}>R$ 2.000</p>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ── BENEFÍCIOS ──────────────────────────────────────────── */}
