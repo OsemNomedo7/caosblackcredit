@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
+import { useSiteConfig } from '@/context/SiteConfigContext';
 
 const QUICK_REPLIES = [
   'Como funciona?',
@@ -19,6 +20,13 @@ const AUTO_REPLIES = {
 };
 
 export default function Chat({ userName = '' }) {
+  const cfg = useSiteConfig();
+  const c = cfg.cores || {};
+  const brandName = cfg.brand?.name || 'Suporte';
+  const logoUrl = cfg.banners?.navbar || null;
+  const primaria = c.primaria || '#820AD1';
+  const primariaEscura = c.primaria ? `${c.primaria}cc` : '#5c079a';
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -127,23 +135,25 @@ export default function Chat({ userName = '' }) {
       {/* Botão flutuante */}
       <motion.button
         onClick={() => setIsOpen(o => !o)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center"
-        style={{ background: 'linear-gradient(135deg, #820AD1, #5c079a)' }}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${primaria}, ${primariaEscura})` }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        animate={!isOpen ? { boxShadow: ['0 0 0 0 rgba(130,10,209,0.4)', '0 0 0 20px rgba(130,10,209,0)', '0 0 0 0 rgba(130,10,209,0)'] } : {}}
+        animate={!isOpen ? { boxShadow: [`0 0 0 0 ${primaria}66`, `0 0 0 20px ${primaria}00`, `0 0 0 0 ${primaria}00`] } : {}}
         transition={{ repeat: Infinity, duration: 2.5 }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.span key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }} className="text-xl">✕</motion.span>
+            <motion.span key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }} className="text-xl text-white">✕</motion.span>
+          ) : logoUrl ? (
+            <motion.img key="logo" src={logoUrl} alt={brandName} initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-9 h-9 object-contain rounded-full" />
           ) : (
             <motion.span key="chat" initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-2xl">💬</motion.span>
           )}
         </AnimatePresence>
 
         {unread > 0 && !isOpen && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center text-white">
             {unread}
           </span>
         )}
@@ -159,18 +169,24 @@ export default function Chat({ userName = '' }) {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed bottom-24 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-2xl overflow-hidden shadow-2xl"
             style={{
-              background: 'rgba(255, 255, 255, 0.98)',
-              border: '1px solid rgba(130, 10, 209, 0.2)',
+              background: c.cardBg || 'rgba(255, 255, 255, 0.98)',
+              border: `1px solid ${primaria}33`,
               backdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 60px rgba(130, 10, 209, 0.15)',
+              boxShadow: `0 20px 60px ${primaria}26`,
             }}
           >
             {/* Header */}
-            <div className="p-4" style={{ background: 'linear-gradient(135deg, #820AD1, #4b047d)' }}>
+            <div className="p-4" style={{ background: `linear-gradient(135deg, ${primaria}, ${primariaEscura})` }}>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">🎯</div>
+                {logoUrl ? (
+                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <img src={logoUrl} alt={brandName} className="w-8 h-8 object-contain" />
+                  </div>
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg flex-shrink-0">🎯</div>
+                )}
                 <div>
-                  <p className="font-semibold text-white text-sm">Suporte CreditoFácil</p>
+                  <p className="font-semibold text-white text-sm">Suporte {brandName}</p>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                     <p className="text-white/70 text-xs">Online agora</p>
@@ -194,7 +210,10 @@ export default function Chat({ userName = '' }) {
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`chat-bubble ${msg.sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-support'}`}>
+                  <div
+                    className={`chat-bubble ${msg.sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-support'}`}
+                    style={msg.sender === 'user' ? { background: `linear-gradient(135deg, ${primaria}, ${primariaEscura})` } : {}}
+                  >
                     {msg.message}
                     <div className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-white/50' : 'text-gray-500'}`}>
                       {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -246,7 +265,7 @@ export default function Chat({ userName = '' }) {
                   onClick={() => sendMessage()}
                   disabled={!inputText.trim()}
                   className="w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40"
-                  style={{ background: 'linear-gradient(135deg, #820AD1, #5c079a)' }}
+                  style={{ background: `linear-gradient(135deg, ${primaria}, ${primariaEscura})` }}
                 >
                   <svg className="w-4 h-4 text-white rotate-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2 12L22 2L14 22L11 13L2 12Z" />
