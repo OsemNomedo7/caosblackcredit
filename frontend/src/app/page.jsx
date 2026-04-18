@@ -68,6 +68,7 @@ export default function LandingPage() {
 
   const glareX = useTransform(springRotY, [-22, 22], ['0%', '100%']);
   const glareY = useTransform(springRotX, [22, -22], ['0%', '100%']);
+  const glareBg = useTransform([glareX, glareY], ([x, y]) => `radial-gradient(circle at ${x} ${y}, rgba(255,255,255,0.18), transparent 65%)`);
 
   const benefits = cfg.beneficios || [];
   const passos = cfg.passos || [];
@@ -247,7 +248,7 @@ export default function LandingPage() {
             <motion.div
               style={{
                 position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', zIndex: 2,
-                background: useTransform([glareX, glareY], ([x, y]) => `radial-gradient(circle at ${x} ${y}, rgba(255,255,255,0.18), transparent 65%)`),
+                background: glareBg,
               }}
             />
 
