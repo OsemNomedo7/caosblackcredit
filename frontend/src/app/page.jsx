@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Lock, Building2, Zap, ClipboardList, Shield, KeyRound, BadgeCheck, Rocket, Search } from 'lucide-react';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -48,6 +48,26 @@ export default function LandingPage() {
   useEffect(() => { setMounted(true); }, []);
 
   const handleCTA = () => router.push('/perfil');
+
+  const cardRotX = useMotionValue(-6);
+  const cardRotY = useMotionValue(3);
+  const springRotX = useSpring(cardRotX, { stiffness: 200, damping: 20 });
+  const springRotY = useSpring(cardRotY, { stiffness: 200, damping: 20 });
+
+  function handleCardMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    cardRotX.set(-y * 22);
+    cardRotY.set(x * 22);
+  }
+  function handleCardMouseLeave() {
+    cardRotX.set(-6);
+    cardRotY.set(3);
+  }
+
+  const glareX = useTransform(springRotY, [-22, 22], ['0%', '100%']);
+  const glareY = useTransform(springRotX, [22, -22], ['0%', '100%']);
 
   const benefits = cfg.beneficios || [];
   const passos = cfg.passos || [];
@@ -202,24 +222,35 @@ export default function LandingPage() {
       {/* ── CARTÃO FLUTUANTE (bridge hero → benefícios) ─────────── */}
       <section className="relative z-10 py-10 px-4 flex justify-center" style={{ background: c.heroBg || 'transparent' }}>
         <motion.div
-          initial={{ opacity: 0, y: 40, rotateX: -12, rotateY: 6 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: -6, rotateY: 3 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ type: 'spring', stiffness: 100, damping: 18 }}
           style={{ perspective: 1200 }}
         >
           <motion.div
-            whileHover={{ rotateX: 0, rotateY: 0, scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            onMouseMove={handleCardMouseMove}
+            onMouseLeave={handleCardMouseLeave}
             onClick={handleCTA}
-            className="relative rounded-3xl overflow-hidden cursor-pointer w-[300px] sm:w-[320px]"
+            className="relative rounded-3xl overflow-hidden cursor-pointer w-[300px] sm:w-[340px]"
             style={{
+              rotateX: springRotX,
+              rotateY: springRotY,
+              transformStyle: 'preserve-3d',
               background: `linear-gradient(135deg, ${c.cartaoCorInicio || '#820AD1'} 0%, ${c.cartaoCorMeio || '#4b047d'} 50%, ${c.cartaoCorFim || '#23023c'} 100%)`,
-              border: '1px solid rgba(255,255,255,0.12)',
-              boxShadow: `0 40px 100px ${c.cartaoCorInicio || '#820AD1'}55, 0 12px 30px rgba(0,0,0,0.25)`,
+              border: '1px solid rgba(255,255,255,0.15)',
+              boxShadow: `0 40px 100px ${c.cartaoCorInicio || '#820AD1'}55, 0 12px 30px rgba(0,0,0,0.3)`,
               padding: '24px 26px',
             }}
           >
+            {/* Glare dinâmico */}
+            <motion.div
+              style={{
+                position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', zIndex: 2,
+                background: useTransform([glareX, glareY], ([x, y]) => `radial-gradient(circle at ${x} ${y}, rgba(255,255,255,0.18), transparent 65%)`),
+              }}
+            />
+
             {/* Glow circles */}
             <div style={{ position: 'absolute', top: -28, right: -28, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.13), transparent)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: -20, left: -20, width: 90, height: 90, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07), transparent)', pointerEvents: 'none' }} />
