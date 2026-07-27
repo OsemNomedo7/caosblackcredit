@@ -10,6 +10,7 @@ import AnimatedBackground from '@/components/AnimatedBackground';
 import Chat from '@/components/Chat';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import BrandLogo from '@/components/BrandLogo';
+import { ArrowLeftIcon } from '@/components/icons';
 
 export default function EmissaoPage() {
   const router = useRouter();
@@ -98,9 +99,9 @@ export default function EmissaoPage() {
       >
         <button
           onClick={() => router.push('/endereco')}
-          className="text-gray-500 hover:text-gray-900 transition-colors text-sm"
+          className="text-gray-500 hover:text-gray-900 transition-colors text-sm flex items-center gap-1.5"
         >
-          ← Voltar
+          <ArrowLeftIcon size={15} /> Voltar
         </button>
         <BrandLogo />
         <div className="flex items-center gap-1.5">

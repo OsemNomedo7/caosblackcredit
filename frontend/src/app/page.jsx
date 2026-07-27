@@ -9,6 +9,7 @@ import { ToastNotifications, ApprovedCounter, OnlineCounter, Testimonials } from
 import Chat from '@/components/Chat';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import BrandLogo from '@/components/BrandLogo';
+import { BENEFIT_ICONS, SparkleIcon, ClipboardIcon, StarIcon, LockIcon, ArrowRightIcon, ChevronDownIcon } from '@/components/icons';
 
 function FAQItem({ q, a, cardBg, cardBorda, textoTitulo, textoCorpo, primaria }) {
   const [open, setOpen] = useState(false);
@@ -25,7 +26,9 @@ function FAQItem({ q, a, cardBg, cardBorda, textoTitulo, textoCorpo, primaria })
     >
       <div className="p-5 flex items-center justify-between gap-4">
         <span className="font-medium text-sm" style={{ color: textoTitulo || '#111827' }}>{q}</span>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} className="text-lg flex-shrink-0" style={{ color: primaria || '#820AD1' }}>▼</motion.span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} className="flex-shrink-0" style={{ color: primaria || '#820AD1' }}>
+          <ChevronDownIcon size={18} />
+        </motion.span>
       </div>
       <AnimatePresence>
         {open && (
@@ -317,7 +320,17 @@ export default function LandingPage() {
                 className="rounded-2xl p-7 transition-all duration-300"
                 style={{ background: c.cardBg || 'rgba(255,255,255,0.85)', border: `1px solid ${c.cardBorda || 'rgba(130,10,209,0.12)'}`, backdropFilter: 'blur(8px)' }}
               >
-                <div className="text-4xl mb-4">{b.icon}</div>
+                {(() => {
+                  const BenefitIcon = BENEFIT_ICONS[b.icon] || SparkleIcon;
+                  return (
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-white"
+                      style={{ background: `linear-gradient(135deg, ${c.primaria || '#820AD1'}, ${c.segundaria || '#4b047d'})` }}
+                    >
+                      <BenefitIcon size={26} strokeWidth={1.6} />
+                    </div>
+                  );
+                })()}
                 <h3 className="font-bold text-lg mb-2" style={{ color: c.textoTitulo || '#111827' }}>{b.titulo || b.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: c.textoCorpo || '#6b7280' }}>{b.desc}</p>
               </motion.div>
@@ -341,21 +354,21 @@ export default function LandingPage() {
             {passos.map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.15 }} viewport={{ once: true }} className="relative">
                 <div className="rounded-2xl p-6 text-center h-full" style={{ background: c.cardBg || 'rgba(255,255,255,0.85)', border: `1px solid ${c.cardBorda || 'rgba(130,10,209,0.12)'}`, backdropFilter: 'blur(8px)' }}>
-                  <div className="text-4xl mb-4">{s.icon || '📋'}</div>
+                  <div className="mb-4" style={{ color: c.primaria || '#820AD1' }}>{s.icon || <ClipboardIcon size={32} strokeWidth={1.5} />}</div>
                   <div className="text-xs font-bold tracking-widest mb-2" style={{ color: c.primaria || '#820AD1' }}>{s.numero || s.n}</div>
                   <h3 className="font-bold mb-2" style={{ color: c.textoTitulo || '#111827' }}>{s.titulo || s.title}</h3>
                   <p className="text-sm" style={{ color: c.textoCorpo || '#6b7280' }}>{s.desc}</p>
                 </div>
                 {i < passos.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 text-xl z-10" style={{ color: c.primaria || '#820AD1' }}>→</div>
+                  <div className="hidden lg:block absolute top-1/2 -right-3 z-10" style={{ color: c.primaria || '#820AD1' }}><ArrowRightIcon size={20} /></div>
                 )}
               </motion.div>
             ))}
           </div>
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mt-12">
-            <motion.button onClick={handleCTA} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="btn-primary text-lg px-12 py-5 rounded-2xl font-display font-bold">
-              Começar Agora →
+            <motion.button onClick={handleCTA} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="btn-primary text-lg px-12 py-5 rounded-2xl font-display font-bold flex items-center justify-center gap-2 mx-auto">
+              Começar Agora <ArrowRightIcon size={20} />
             </motion.button>
           </motion.div>
         </div>
@@ -370,8 +383,8 @@ export default function LandingPage() {
               O que dizem nossos <span className="gradient-text">clientes</span>
             </h2>
             <div className="flex items-center justify-center gap-2">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => <span key={i} className="text-yellow-400 text-xl">★</span>)}
+              <div className="flex gap-0.5 text-yellow-400">
+                {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} size={18} />)}
               </div>
               <span className="font-bold text-lg" style={{ color: c.textoTitulo || '#111827' }}>4.9</span>
               <span style={{ color: c.textoCorpo || '#6b7280' }}>(+12.000 avaliações)</span>
@@ -389,8 +402,8 @@ export default function LandingPage() {
             className="rounded-3xl p-10 text-center"
             style={{ background: c.segurancaBg || 'rgba(248,240,255,0.7)', border: `1px solid ${c.cardBorda || 'rgba(130,10,209,0.12)'}` }}
           >
-            <h2 className="text-3xl font-black font-display mb-6" style={{ color: c.textoTitulo || '#111827' }}>
-              🔒 Seus dados estão <span className="gradient-text">100% seguros</span>
+            <h2 className="text-3xl font-black font-display mb-6 flex items-center justify-center gap-3" style={{ color: c.textoTitulo || '#111827' }}>
+              <LockIcon size={30} strokeWidth={1.5} /> Seus dados estão <span className="gradient-text">100% seguros</span>
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
               {[

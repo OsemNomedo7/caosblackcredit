@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Search, BarChart3, Brain, Wallet, Lock, CheckCircle2 } from 'lucide-react';
+import { BankIcon, CheckIcon } from '@/components/icons';
 
 const STEPS = [
   { Icon: Search, text: 'Verificando CPF...', duration: 900 },
@@ -102,10 +103,10 @@ export default function AnalisePage() {
           className="mb-10"
         >
           <div
-            className="inline-flex w-20 h-20 rounded-2xl items-center justify-center text-4xl mb-4"
+            className="inline-flex w-20 h-20 rounded-2xl items-center justify-center text-white mb-4"
             style={{ background: 'linear-gradient(135deg, #820AD1, #4b047d)', boxShadow: '0 0 40px rgba(130,10,209,0.35)' }}
           >
-            🏦
+            <BankIcon size={36} strokeWidth={1.5} />
           </div>
           <h2 className="text-xl font-black font-display text-gray-900">
             {name ? `Olá, ${name.split(' ')[0]}!` : 'Analisando...'}
@@ -152,7 +153,7 @@ export default function AnalisePage() {
                         className="w-full h-full rounded-full flex items-center justify-center"
                         style={{ background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.5)' }}
                       >
-                        <span className="text-green-400 text-sm">✓</span>
+                        <span className="text-green-400"><CheckIcon size={14} strokeWidth={2.2} /></span>
                       </motion.div>
                     ) : isCurrent ? (
                       <div

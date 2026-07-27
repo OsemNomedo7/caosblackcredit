@@ -9,6 +9,7 @@ import { ApprovedCounter } from '@/components/SocialProof';
 import Chat from '@/components/Chat';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import BrandLogo from '@/components/BrandLogo';
+import { ArrowLeftIcon, ArrowRightIcon } from '@/components/icons';
 
 const ClientIcon = () => (
   <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -84,7 +85,7 @@ export default function PerfilPage() {
           onClick={() => router.push('/')}
           className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 transition-colors text-sm"
         >
-          ← Voltar
+          <ArrowLeftIcon size={15} /> Voltar
         </button>
 
         <BrandLogo />
@@ -198,10 +199,10 @@ export default function PerfilPage() {
 
                 {/* Seta */}
                 <motion.div
-                  className="absolute bottom-6 right-6 text-2xl"
+                  className="absolute bottom-6 right-6"
                   animate={{ x: hovered === profile.id ? 4 : 0 }}
                 >
-                  →
+                  <ArrowRightIcon size={22} />
                 </motion.div>
               </motion.button>
             ))}

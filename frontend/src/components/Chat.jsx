@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 import { useSiteConfig } from '@/context/SiteConfigContext';
+import { CloseIcon, ChatIcon, TargetIcon } from './icons';
 
 const QUICK_REPLIES = [
   'Como funciona?',
@@ -13,10 +14,10 @@ const QUICK_REPLIES = [
 ];
 
 const AUTO_REPLIES = {
-  'como funciona': 'É simples! Você preenche seus dados, consultamos sua situação de crédito e em segundos você tem a resposta. Aprovado, basta emitir o cartão! 💳',
-  'já fui aprovado': 'Para verificar sua aprovação, você precisará acessar a etapa de resultado. Se precisar de ajuda, pode me contar mais detalhes? 😊',
-  'como pagar': 'O pagamento é feito por PIX, de forma rápida e segura. Taxa de emissão: R$19,90 + frete R$29,90. Você recebe QR Code para pagar na hora! 📱',
-  'qual o prazo': 'Após o pagamento confirmado, seu cartão é enviado em 1-3 dias úteis com código de rastreio no seu e-mail. 🚚',
+  'como funciona': 'É simples! Você preenche seus dados, consultamos sua situação de crédito e em segundos você tem a resposta. Aprovado, basta emitir o cartão!',
+  'já fui aprovado': 'Para verificar sua aprovação, você precisará acessar a etapa de resultado. Se precisar de ajuda, pode me contar mais detalhes?',
+  'como pagar': 'O pagamento é feito por PIX, de forma rápida e segura. Taxa de emissão: R$19,90 + frete R$29,90. Você recebe QR Code para pagar na hora!',
+  'qual o prazo': 'Após o pagamento confirmado, seu cartão é enviado em 1-3 dias úteis com código de rastreio no seu e-mail.',
 };
 
 export default function Chat({ userName = '' }) {
@@ -144,11 +145,15 @@ export default function Chat({ userName = '' }) {
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.span key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }} className="text-xl text-white">✕</motion.span>
+            <motion.span key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }} className="text-white">
+              <CloseIcon size={24} />
+            </motion.span>
           ) : logoUrl ? (
             <motion.img key="logo" src={logoUrl} alt={brandName} initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-9 h-9 object-contain rounded-full" />
           ) : (
-            <motion.span key="chat" initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-2xl">💬</motion.span>
+            <motion.span key="chat" initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-white">
+              <ChatIcon size={26} />
+            </motion.span>
           )}
         </AnimatePresence>
 
@@ -183,7 +188,7 @@ export default function Chat({ userName = '' }) {
                     <img src={logoUrl} alt={brandName} className="w-8 h-8 object-contain" />
                   </div>
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg flex-shrink-0">🎯</div>
+                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white flex-shrink-0"><TargetIcon size={18} /></div>
                 )}
                 <div>
                   <p className="font-semibold text-white text-sm">Suporte {brandName}</p>

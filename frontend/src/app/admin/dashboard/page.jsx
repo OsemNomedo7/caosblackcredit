@@ -9,6 +9,18 @@ import {
   updateSettings, getSettings, deleteLead, getWebhookUrl, updateCredentials
 } from '@/lib/api';
 import PersonalizacaoPanel from './PersonalizacaoPanel';
+import {
+  DotSolidIcon, DotHalfIcon, DotRingIcon, CardIcon, PackageIcon, MoneyIcon, KeyIcon,
+  ClipboardIcon, BuildingIcon, ChartIcon, UnlockIcon, LockIcon, LightningIcon, BellIcon,
+  LinkIcon, ShieldIcon, CheckIcon, CheckCircleIcon, SaveIcon, ChatIcon, UserIcon, UsersIcon,
+  RefreshIcon, ArrowUpRightIcon, GridIcon, SettingsIcon, PaletteIcon, WarningIcon,
+  ArrowLeftIcon, ArrowRightIcon, SearchIcon, TrashIcon, InboxIcon, PinIcon, CrownIcon,
+  TargetIcon, CalendarIcon, LogoutIcon, EyeIcon, EyeOffIcon, ArrowUpIcon, ArrowDownIcon,
+} from '@/components/icons';
+
+function Spinner({ size = 12, color = '#fff' }) {
+  return <span style={{ display: 'inline-block', width: size, height: size, borderRadius: '50%', border: `2px solid ${color}40`, borderTopColor: color, animation: 'spin 0.7s linear infinite' }} />;
+}
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const D = {
@@ -210,7 +222,7 @@ function DonutChart({ paid = 0, pending = 0, analyzing = 0, size = 160 }) {
 }
 
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, accent = D.purple, accentSoft = D.purpleSoft, trend, sparkData }) {
+function StatCard({ icon: Icon, label, value, sub, accent = D.purple, accentSoft = D.purpleSoft, trend, sparkData }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -225,10 +237,10 @@ function StatCard({ icon, label, value, sub, accent = D.purple, accentSoft = D.p
     >
       <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: `radial-gradient(circle, ${accent}30, transparent)`, pointerEvents: 'none' }} />
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${accent}20`, border: `1px solid ${accent}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>{icon}</div>
+        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${accent}20`, border: `1px solid ${accent}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: accent }}><Icon size={18} strokeWidth={1.7} /></div>
         {trend !== undefined && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: trend >= 0 ? D.green : D.red, background: trend >= 0 ? D.greenSoft : D.redSoft, border: `1px solid ${trend >= 0 ? D.greenBdr : D.redSoft}`, padding: '2px 7px', borderRadius: 20 }}>
-            {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
+          <span style={{ fontSize: 11, fontWeight: 700, color: trend >= 0 ? D.green : D.red, background: trend >= 0 ? D.greenSoft : D.redSoft, border: `1px solid ${trend >= 0 ? D.greenBdr : D.redSoft}`, display: 'inline-flex', alignItems: 'center', gap: 2, padding: '2px 7px', borderRadius: 20 }}>
+            {trend >= 0 ? <ArrowUpIcon size={11} strokeWidth={2.4} /> : <ArrowDownIcon size={11} strokeWidth={2.4} />} {Math.abs(trend)}%
           </span>
         )}
       </div>
@@ -245,14 +257,14 @@ function StatCard({ icon, label, value, sub, accent = D.purple, accentSoft = D.p
 // ─── STATUS BADGE ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const cfg = {
-    paid:      { label: 'Pago',     color: D.green,  soft: D.greenSoft,  bdr: D.greenBdr,       icon: '●' },
-    pending:   { label: 'Pendente', color: D.yellow, soft: D.yellowSoft, bdr: `${D.yellow}40`,  icon: '◐' },
-    analyzing: { label: 'Análise',  color: D.blue,   soft: D.blueSoft,   bdr: `${D.blue}40`,    icon: '◌' },
+    paid:      { label: 'Pago',     color: D.green,  soft: D.greenSoft,  bdr: D.greenBdr,       icon: DotSolidIcon },
+    pending:   { label: 'Pendente', color: D.yellow, soft: D.yellowSoft, bdr: `${D.yellow}40`,  icon: DotHalfIcon },
+    analyzing: { label: 'Análise',  color: D.blue,   soft: D.blueSoft,   bdr: `${D.blue}40`,    icon: DotRingIcon },
   };
   const s = cfg[status] || cfg.pending;
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: s.color, background: s.soft, border: `1px solid ${s.bdr}`, padding: '3px 9px', borderRadius: 20 }}>
-      <span style={{ fontSize: 7 }}>{s.icon}</span>{s.label}
+      <s.icon size={8} strokeWidth={2} />{s.label}
     </span>
   );
 }
@@ -324,7 +336,7 @@ function AdminChat({ socket }) {
       <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '14px 16px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: D.textPri, fontWeight: 700, fontSize: 13 }}>Conversas</span>
-          <button onClick={loadSessions} style={{ color: D.textMut, fontSize: 11, background: 'none', border: 'none', cursor: 'pointer' }}>↻ atualizar</button>
+          <button onClick={loadSessions} style={{ color: D.textMut, fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}><RefreshIcon size={12} /> atualizar</button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {sessions.length === 0 ? (
@@ -345,8 +357,8 @@ function AdminChat({ socket }) {
                   <span style={{ minWidth: 18, height: 18, borderRadius: 9, background: D.purple, color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '0 4px' }}>{s.unread}</span>
                 )}
               </div>
-              <p style={{ color: D.textMut, fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {s.last_sender === 'support' ? '↗ Você: ' : ''}{s.last_msg}
+              <p style={{ color: D.textMut, fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 3 }}>
+                {s.last_sender === 'support' && <ArrowUpRightIcon size={10} />}{s.last_sender === 'support' ? 'Você: ' : ''}{s.last_msg}
               </p>
             </button>
           ))}
@@ -357,13 +369,13 @@ function AdminChat({ socket }) {
       <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {!activeSession ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 36 }}>💬</div>
+            <div style={{ color: D.textMut }}><ChatIcon size={36} strokeWidth={1.3} /></div>
             <p style={{ color: D.textMut, fontSize: 13 }}>Selecione uma conversa</p>
           </div>
         ) : (
           <>
             <div style={{ padding: '12px 18px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👤</div>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d8b4fe' }}><UserIcon size={16} /></div>
               <div>
                 <p style={{ color: D.textPri, fontSize: 13, fontWeight: 600 }}>{activeData?.lead_name || 'Usuário'}</p>
                 <p style={{ color: D.textMut, fontSize: 11 }}>ID: {activeSession.slice(-10)}</p>
@@ -419,18 +431,18 @@ function SettingsPanel() {
   };
 
   const fields = [
-    { key: 'emission_fee',    label: 'Taxa de Emissão',          icon: '💳', type: 'number', step: '0.01', suffix: 'R$' },
-    { key: 'shipping_fee',   label: 'Taxa de Envio',             icon: '📦', type: 'number', step: '0.01', suffix: 'R$' },
-    { key: 'max_limit',      label: 'Limite Máximo',             icon: '💰', type: 'number', suffix: 'R$' },
-    { key: 'pix_key',        label: 'Chave PIX (fallback)',      icon: '🔑', type: 'text' },
-    { key: 'pix_type',       label: 'Tipo da Chave PIX',         icon: '📋', type: 'text' },
-    { key: 'beneficiary_name', label: 'Nome do Beneficiário',    icon: '🏢', type: 'text' },
-    { key: 'approved_today', label: 'Contador "Aprovados Hoje"', icon: '📊', type: 'number' },
+    { key: 'emission_fee',    label: 'Taxa de Emissão',          icon: CardIcon, type: 'number', step: '0.01', suffix: 'R$' },
+    { key: 'shipping_fee',   label: 'Taxa de Envio',             icon: PackageIcon, type: 'number', step: '0.01', suffix: 'R$' },
+    { key: 'max_limit',      label: 'Limite Máximo',             icon: MoneyIcon, type: 'number', suffix: 'R$' },
+    { key: 'pix_key',        label: 'Chave PIX (fallback)',      icon: KeyIcon, type: 'text' },
+    { key: 'pix_type',       label: 'Tipo da Chave PIX',         icon: ClipboardIcon, type: 'text' },
+    { key: 'beneficiary_name', label: 'Nome do Beneficiário',    icon: BuildingIcon, type: 'text' },
+    { key: 'approved_today', label: 'Contador "Aprovados Hoje"', icon: ChartIcon, type: 'number' },
   ];
 
   const sigiloFields = [
-    { key: 'sigilopay_public_key', label: 'SigiloPay — Public Key', icon: '🔓', type: 'text' },
-    { key: 'sigilopay_secret_key', label: 'SigiloPay — Secret Key', icon: '🔐', type: 'password' },
+    { key: 'sigilopay_public_key', label: 'SigiloPay — Public Key', icon: UnlockIcon, type: 'text' },
+    { key: 'sigilopay_secret_key', label: 'SigiloPay — Secret Key', icon: LockIcon, type: 'password' },
   ];
 
   return (
@@ -439,7 +451,7 @@ function SettingsPanel() {
         {fields.map(f => (
           <div key={f.key} style={{ ...cardStyle, padding: '16px 18px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: D.textSec, fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              <span>{f.icon}</span>{f.label}
+              <f.icon size={13} />{f.label}
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {f.suffix && <span style={{ color: D.textMut, fontSize: 13 }}>{f.suffix}</span>}
@@ -453,7 +465,7 @@ function SettingsPanel() {
       {/* SigiloPay */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>⚡</div>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d8b4fe' }}><LightningIcon size={14} /></div>
           <div>
             <p style={{ color: D.textPri, fontSize: 13, fontWeight: 700 }}>Gateway SigiloPay</p>
             <p style={{ color: D.textMut, fontSize: 11 }}>Quando configurado, gera QR Code real via SigiloPay. Sem chaves = PIX local de fallback.</p>
@@ -463,7 +475,7 @@ function SettingsPanel() {
           {sigiloFields.map(f => (
             <div key={f.key} style={{ ...cardStyle, padding: '16px 18px', borderColor: D.borderHi }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#d8b4fe', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                <span>{f.icon}</span>{f.label}
+                <f.icon size={13} />{f.label}
               </label>
               <input type={f.type} value={settings[f.key] || ''} onChange={e => setSettings(s => ({ ...s, [f.key]: e.target.value }))}
                 placeholder={f.key.includes('secret') ? '••••••••••••••••' : 'pk_...'}
@@ -476,7 +488,7 @@ function SettingsPanel() {
       {/* Webhook */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: D.blueSoft, border: `1px solid ${D.blue}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>🔔</div>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: D.blueSoft, border: `1px solid ${D.blue}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#93c5fd' }}><BellIcon size={14} /></div>
           <div>
             <p style={{ color: D.textPri, fontSize: 13, fontWeight: 700 }}>Webhook de Pagamento</p>
             <p style={{ color: D.textMut, fontSize: 11 }}>Configure esta URL no painel SigiloPay para receber confirmações automáticas de pagamento.</p>
@@ -484,15 +496,15 @@ function SettingsPanel() {
         </div>
         <div style={{ ...cardStyle, padding: '16px 18px', borderColor: `${D.blue}40`, marginBottom: 12 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#93c5fd', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            🔗 URL do Webhook
+            <LinkIcon size={13} /> URL do Webhook
           </label>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <div style={{ flex: 1, background: 'rgba(59,130,246,0.06)', border: `1px solid ${D.blue}35`, borderRadius: 10, padding: '9px 12px', color: '#93c5fd', fontSize: 12, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {webhookUrl || 'Carregando...'}
             </div>
             <button onClick={() => { if (!webhookUrl) return; navigator.clipboard.writeText(webhookUrl).then(() => { setWebhookCopied(true); setTimeout(() => setWebhookCopied(false), 2000); }); }}
-              style={{ padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, flexShrink: 0, background: webhookCopied ? D.greenSoft : D.blueSoft, color: webhookCopied ? D.green : '#93c5fd', border: `1px solid ${webhookCopied ? D.greenBdr : `${D.blue}40`}`, cursor: 'pointer', transition: 'all .2s', whiteSpace: 'nowrap' }}>
-              {webhookCopied ? '✅ Copiado!' : '📋 Copiar'}
+              style={{ padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6, background: webhookCopied ? D.greenSoft : D.blueSoft, color: webhookCopied ? D.green : '#93c5fd', border: `1px solid ${webhookCopied ? D.greenBdr : `${D.blue}40`}`, cursor: 'pointer', transition: 'all .2s', whiteSpace: 'nowrap' }}>
+              {webhookCopied ? <><CheckIcon size={13} /> Copiado!</> : <><ClipboardIcon size={13} /> Copiar</>}
             </button>
           </div>
           <p style={{ color: D.textMut, fontSize: 11, marginTop: 8 }}>
@@ -501,7 +513,7 @@ function SettingsPanel() {
         </div>
         <div style={{ ...cardStyle, padding: '16px 18px', borderColor: `${D.blue}40` }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#93c5fd', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            🛡️ Token de Validação (opcional)
+            <ShieldIcon size={13} /> Token de Validação (opcional)
           </label>
           <input type="text" value={settings.webhook_token || ''} onChange={e => setSettings(s => ({ ...s, webhook_token: e.target.value }))}
             placeholder="Cole aqui o token fornecido pela SigiloPay..."
@@ -511,8 +523,8 @@ function SettingsPanel() {
       </div>
 
       <button onClick={handleSave} disabled={saving}
-        style={{ padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 700, background: saved ? D.greenSoft : `linear-gradient(135deg, ${D.purple}, #4b047d)`, color: saved ? D.green : '#fff', border: `1px solid ${saved ? D.greenBdr : 'transparent'}`, cursor: 'pointer', transition: 'all .2s' }}>
-        {saving ? '⏳ Salvando...' : saved ? '✅ Salvo!' : '💾 Salvar Configurações'}
+        style={{ padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8, background: saved ? D.greenSoft : `linear-gradient(135deg, ${D.purple}, #4b047d)`, color: saved ? D.green : '#fff', border: `1px solid ${saved ? D.greenBdr : 'transparent'}`, cursor: 'pointer', transition: 'all .2s' }}>
+        {saving ? <><Spinner /> Salvando...</> : saved ? <><CheckIcon size={15} /> Salvo!</> : <><SaveIcon size={15} /> Salvar Configurações</>}
       </button>
     </div>
   );
@@ -589,7 +601,7 @@ function ContaPanel() {
         {/* Senha atual */}
         <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>🔐</div>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.purpleSoft, border: `1px solid ${D.borderHi}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d8b4fe' }}><LockIcon size={16} /></div>
             <p style={{ color: D.textPri, fontWeight: 700, fontSize: 14 }}>Verificação de identidade</p>
           </div>
           <label style={labelStyle}>Senha atual <span style={{ color: D.red }}>*</span></label>
@@ -603,8 +615,8 @@ function ContaPanel() {
               autoComplete="current-password"
             />
             <button type="button" onClick={() => setShowCurrent(s => !s)}
-              style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: D.textMut, fontSize: 14 }}>
-              {showCurrent ? '🙈' : '👁️'}
+              style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: D.textMut, display: 'flex' }}>
+              {showCurrent ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
             </button>
           </div>
         </div>
@@ -612,7 +624,7 @@ function ContaPanel() {
         {/* Novo usuário */}
         <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.blueSoft, border: `1px solid ${D.blue}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>◈</div>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.blueSoft, border: `1px solid ${D.blue}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#93c5fd' }}><UserIcon size={16} /></div>
             <div>
               <p style={{ color: D.textPri, fontWeight: 700, fontSize: 14 }}>Novo usuário</p>
               <p style={{ color: D.textMut, fontSize: 11 }}>Deixe em branco para manter o atual</p>
@@ -632,7 +644,7 @@ function ContaPanel() {
         {/* Nova senha */}
         <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.greenSoft, border: `1px solid ${D.greenBdr}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>🔑</div>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: D.greenSoft, border: `1px solid ${D.greenBdr}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: D.green }}><KeyIcon size={16} /></div>
             <div>
               <p style={{ color: D.textPri, fontWeight: 700, fontSize: 14 }}>Nova senha</p>
               <p style={{ color: D.textMut, fontSize: 11 }}>Mínimo 6 caracteres · Deixe em branco para manter</p>
@@ -651,8 +663,8 @@ function ContaPanel() {
                   autoComplete="new-password"
                 />
                 <button type="button" onClick={() => setShowNew(s => !s)}
-                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: D.textMut, fontSize: 14 }}>
-                  {showNew ? '🙈' : '👁️'}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: D.textMut, display: 'flex' }}>
+                  {showNew ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                 </button>
               </div>
             </div>
@@ -714,7 +726,7 @@ function ContaPanel() {
                 fontSize: 13, display: 'flex', alignItems: 'center', gap: 8,
               }}
             >
-              {msg.type === 'ok' ? '✅' : '⚠️'} {msg.text}
+              {msg.type === 'ok' ? <CheckCircleIcon size={15} /> : <WarningIcon size={15} />} {msg.text}
             </motion.div>
           )}
         </AnimatePresence>
@@ -724,13 +736,14 @@ function ContaPanel() {
           disabled={saving}
           style={{
             padding: '13px 32px', borderRadius: 12, fontSize: 14, fontWeight: 700,
+            display: 'inline-flex', alignItems: 'center', gap: 8,
             background: saving ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${D.purple}, #4b047d)`,
             color: saving ? D.textMut : '#fff',
             border: 'none', cursor: saving ? 'default' : 'pointer', transition: 'all .2s',
             boxShadow: saving ? 'none' : `0 4px 20px ${D.purpleGlow}`,
           }}
         >
-          {saving ? '⏳ Salvando...' : '💾 Salvar Credenciais'}
+          {saving ? <><Spinner color={D.textMut} /> Salvando...</> : <><SaveIcon size={15} /> Salvar Credenciais</>}
         </button>
       </form>
     </div>
@@ -738,7 +751,7 @@ function ContaPanel() {
 }
 
 // ─── SIDEBAR NAV ITEM ────────────────────────────────────────────────────────
-function NavItem({ tab, label, icon, active, collapsed, badge, onClick }) {
+function NavItem({ tab, label, icon: Icon, active, collapsed, badge, onClick, flash }) {
   return (
     <button
       onClick={onClick}
@@ -754,7 +767,7 @@ function NavItem({ tab, label, icon, active, collapsed, badge, onClick }) {
         marginBottom: 2, borderRadius: collapsed ? 0 : '0 10px 10px 0',
       }}
     >
-      <span style={{ fontSize: 17, flexShrink: 0, color: active ? '#d8b4fe' : D.textMut }}>{icon}</span>
+      <span style={{ flexShrink: 0, display: 'flex', color: flash ? D.green : active ? '#d8b4fe' : D.textMut }}><Icon size={18} /></span>
       {!collapsed && <span style={{ color: active ? '#d8b4fe' : D.textSec, fontSize: 13, fontWeight: active ? 700 : 500, flex: 1, textAlign: 'left' }}>{label}</span>}
       {badge > 0 && (
         <span style={{ minWidth: 18, height: 18, borderRadius: 9, background: D.purple, color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', position: collapsed ? 'absolute' : 'relative', top: collapsed ? 6 : 'auto', right: collapsed ? 6 : 'auto' }}>{badge}</span>
@@ -832,12 +845,12 @@ export default function AdminDashboard() {
   const sparkPaid  = chartData.map(d => d.paid);
 
   const TABS = [
-    { id: 'dashboard',      icon: '▣', label: 'Dashboard' },
-    { id: 'leads',          icon: '⊞', label: 'Leads' },
-    { id: 'chat',           icon: '◎', label: 'Chat', badge: unreadChats },
-    { id: 'settings',       icon: '◈', label: 'Configurações' },
-    { id: 'personalizacao', icon: '◐', label: 'Personalização' },
-    { id: 'conta',          icon: '👤', label: 'Minha Conta' },
+    { id: 'dashboard',      icon: GridIcon, label: 'Dashboard' },
+    { id: 'leads',          icon: UsersIcon, label: 'Leads' },
+    { id: 'chat',           icon: ChatIcon, label: 'Chat', badge: unreadChats },
+    { id: 'settings',       icon: SettingsIcon, label: 'Configurações' },
+    { id: 'personalizacao', icon: PaletteIcon, label: 'Personalização' },
+    { id: 'conta',          icon: UserIcon, label: 'Minha Conta' },
   ];
 
   return (
@@ -864,9 +877,9 @@ export default function AdminDashboard() {
               />
               <button
                 onClick={() => setCollapsed(true)}
-                style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer', color: D.textMut, fontSize: 14, borderRadius: 6, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer', color: D.textMut, borderRadius: 6, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                 title="Recolher"
-              >‹</button>
+              ><ArrowLeftIcon size={13} /></button>
             </div>
           ) : (
             <div style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
@@ -877,9 +890,9 @@ export default function AdminDashboard() {
               />
               <button
                 onClick={() => setCollapsed(false)}
-                style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer', color: D.textMut, fontSize: 14, borderRadius: 6, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer', color: D.textMut, borderRadius: 6, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 title="Expandir"
-              >›</button>
+              ><ArrowRightIcon size={13} /></button>
             </div>
           )}
         </div>
@@ -891,7 +904,8 @@ export default function AdminDashboard() {
               key={t.id}
               tab={t.id}
               label={t.label}
-              icon={t.id === 'dashboard' && newLeadFlash ? '🟢' : t.icon}
+              icon={t.id === 'dashboard' && newLeadFlash ? DotSolidIcon : t.icon}
+              flash={t.id === 'dashboard' && newLeadFlash}
               active={activeTab === t.id}
               collapsed={collapsed}
               badge={t.badge}
@@ -924,7 +938,7 @@ export default function AdminDashboard() {
             onMouseEnter={e => e.currentTarget.style.color = D.red}
             onMouseLeave={e => e.currentTarget.style.color = D.textMut}
           >
-            <span>⎋</span>
+            <LogoutIcon size={16} />
             {!collapsed && <span>Sair</span>}
           </button>
         </div>
@@ -961,16 +975,16 @@ export default function AdminDashboard() {
                       </p>
                       <h1 style={{ color: D.textPri, fontSize: 24, fontWeight: 900, margin: 0 }}>Visão Geral</h1>
                     </div>
-                    <button onClick={loadData} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 9, fontSize: 12, fontWeight: 600, color: D.textSec, background: D.card, border: `1px solid ${D.border}`, cursor: 'pointer' }}>↻ Atualizar</button>
+                    <button onClick={loadData} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 9, fontSize: 12, fontWeight: 600, color: D.textSec, background: D.card, border: `1px solid ${D.border}`, cursor: 'pointer' }}><RefreshIcon size={13} /> Atualizar</button>
                   </div>
 
                   {/* KPI Cards */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12, marginBottom: 24 }}>
-                    <StatCard icon="👥" label="Total de Leads" value={stats?.total || 0} sub="Desde o início" trend={12} sparkData={sparkTotal} />
-                    <StatCard icon="✅" label="Pagamentos" value={stats?.paid || 0} sub="Confirmados" accent={D.green} accentSoft={D.greenSoft} trend={8} sparkData={sparkPaid} />
-                    <StatCard icon="📅" label="Hoje" value={stats?.today || 0} sub="Novos leads" accent={D.blue} accentSoft={D.blueSoft} />
-                    <StatCard icon="💰" label="Receita Total" value={`R$ ${(stats?.revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} sub={`Ticket médio: R$ ${(stats?.ticketMedio || 49.80).toFixed(2)}`} accent={D.yellow} accentSoft={D.yellowSoft} trend={5} />
-                    <StatCard icon="🎯" label="Conversão" value={`${conversionRate}%`} sub="Leads que pagaram" accent="#a855f7" accentSoft="rgba(168,85,247,0.1)" />
+                    <StatCard icon={UsersIcon} label="Total de Leads" value={stats?.total || 0} sub="Desde o início" trend={12} sparkData={sparkTotal} />
+                    <StatCard icon={CheckIcon} label="Pagamentos" value={stats?.paid || 0} sub="Confirmados" accent={D.green} accentSoft={D.greenSoft} trend={8} sparkData={sparkPaid} />
+                    <StatCard icon={CalendarIcon} label="Hoje" value={stats?.today || 0} sub="Novos leads" accent={D.blue} accentSoft={D.blueSoft} />
+                    <StatCard icon={MoneyIcon} label="Receita Total" value={`R$ ${(stats?.revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} sub={`Ticket médio: R$ ${(stats?.ticketMedio || 49.80).toFixed(2)}`} accent={D.yellow} accentSoft={D.yellowSoft} trend={5} />
+                    <StatCard icon={TargetIcon} label="Conversão" value={`${conversionRate}%`} sub="Leads que pagaram" accent="#a855f7" accentSoft="rgba(168,85,247,0.1)" />
                   </div>
 
                   {/* Charts row */}
@@ -1027,7 +1041,7 @@ export default function AdminDashboard() {
                           <div key={ps.profile} style={{ marginBottom: 16 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 16 }}>{isClient ? '👑' : '🎯'}</span>
+                                <span style={{ color: isClient ? D.blue : D.purple, display: 'flex' }}>{isClient ? <CrownIcon size={15} /> : <TargetIcon size={15} />}</span>
                                 <span style={{ color: D.textSec, fontSize: 13 }}>{isClient ? 'Clientes' : 'Negativados'}</span>
                               </div>
                               <div style={{ textAlign: 'right' }}>
@@ -1050,7 +1064,7 @@ export default function AdminDashboard() {
                     <div style={{ ...cardStyle, overflow: 'hidden' }}>
                       <div style={{ padding: '16px 18px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <p style={{ color: D.textPri, fontWeight: 700, fontSize: 14 }}>Leads Recentes</p>
-                        <button onClick={() => setActiveTab('leads')} style={{ color: '#a78bfa', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Ver todos →</button>
+                        <button onClick={() => setActiveTab('leads')} style={{ color: '#a78bfa', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>Ver todos <ArrowRightIcon size={12} /></button>
                       </div>
                       <DataTable
                         headers={['Nome', 'Perfil', 'Score', 'Status', 'Data']}
@@ -1063,8 +1077,8 @@ export default function AdminDashboard() {
                               <div style={{ color: D.textMut, fontSize: 11, fontFamily: 'monospace' }}>{l.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</div>
                             </td>
                             <td style={{ padding: '11px 14px' }}>
-                              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, color: l.profile === 'client' ? D.blue : '#a78bfa', background: l.profile === 'client' ? D.blueSoft : D.purpleSoft, border: `1px solid ${l.profile === 'client' ? `${D.blue}35` : D.borderHi}` }}>
-                                {l.profile === 'client' ? '👑 Cliente' : '🎯 Negativado'}
+                              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 4, color: l.profile === 'client' ? D.blue : '#a78bfa', background: l.profile === 'client' ? D.blueSoft : D.purpleSoft, border: `1px solid ${l.profile === 'client' ? `${D.blue}35` : D.borderHi}` }}>
+                                {l.profile === 'client' ? <CrownIcon size={11} /> : <TargetIcon size={11} />} {l.profile === 'client' ? 'Cliente' : 'Negativado'}
                               </span>
                             </td>
                             <td style={{ padding: '11px 14px' }}><ScoreBar score={l.score} /></td>
@@ -1090,7 +1104,7 @@ export default function AdminDashboard() {
                       <p style={{ color: D.textMut, fontSize: 13, marginTop: 4 }}>{stats?.total || 0} registros no total</p>
                     </div>
                     <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.textMut, fontSize: 13 }}>🔍</span>
+                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.textMut, display: 'flex' }}><SearchIcon size={14} /></span>
                       <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Buscar por nome ou CPF..."
                         style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '10px 14px 10px 36px', color: D.textPri, fontSize: 13, outline: 'none', width: 280 }} />
                     </div>
@@ -1109,8 +1123,8 @@ export default function AdminDashboard() {
                             <div style={{ color: D.textMut, fontSize: 11, fontFamily: 'monospace' }}>{String(l.cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</div>
                           </td>
                           <td style={{ padding: '12px 14px' }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, color: l.profile === 'client' ? D.blue : '#a78bfa', background: l.profile === 'client' ? D.blueSoft : D.purpleSoft, border: `1px solid ${l.profile === 'client' ? `${D.blue}35` : D.borderHi}` }}>
-                              {l.profile === 'client' ? '👑 Cliente' : '🎯 Neg.'}
+                            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 4, color: l.profile === 'client' ? D.blue : '#a78bfa', background: l.profile === 'client' ? D.blueSoft : D.purpleSoft, border: `1px solid ${l.profile === 'client' ? `${D.blue}35` : D.borderHi}` }}>
+                              {l.profile === 'client' ? <CrownIcon size={11} /> : <TargetIcon size={11} />} {l.profile === 'client' ? 'Cliente' : 'Neg.'}
                             </span>
                           </td>
                           <td style={{ padding: '12px 14px' }}><ScoreBar score={l.score} /></td>
@@ -1123,7 +1137,7 @@ export default function AdminDashboard() {
                               </div>
                             ) : null}
                             {l.location ? (
-                              <div style={{ color: D.textSec, fontSize: 11 }}>📍 {l.location}</div>
+                              <div style={{ color: D.textSec, fontSize: 11, display: 'flex', alignItems: 'center', gap: 3 }}><PinIcon size={11} /> {l.location}</div>
                             ) : l.ip ? (
                               <div style={{ color: D.textMut, fontSize: 10 }}>sem geo</div>
                             ) : (
@@ -1133,26 +1147,27 @@ export default function AdminDashboard() {
                           <td style={{ padding: '12px 14px', color: D.textMut, fontSize: 11, whiteSpace: 'nowrap' }}>{new Date(l.created_at).toLocaleDateString('pt-BR')}</td>
                           <td style={{ padding: '12px 14px' }}>
                             <button onClick={() => { if (confirm(`Excluir lead ${l.name}?`)) deleteLead(l.id).then(loadData).catch(() => {}); }}
-                              style={{ background: 'none', border: 'none', color: D.textMut, cursor: 'pointer', fontSize: 14, padding: '4px', borderRadius: 6, transition: 'color .15s' }}
+                              style={{ background: 'none', border: 'none', color: D.textMut, cursor: 'pointer', display: 'flex', padding: '4px', borderRadius: 6, transition: 'color .15s' }}
                               onMouseEnter={e => e.currentTarget.style.color = D.red}
                               onMouseLeave={e => e.currentTarget.style.color = D.textMut}
-                              title="Excluir lead">🗑</button>
+                              title="Excluir lead"><TrashIcon size={15} /></button>
                           </td>
                         </tr>
                       ))}
                     />
                     {leads.length === 0 && (
-                      <div style={{ padding: 48, textAlign: 'center', color: D.textMut, fontSize: 14 }}>
-                        {search ? `🔍 Nenhum resultado para "${search}"` : '📭 Nenhum lead cadastrado'}
+                      <div style={{ padding: 48, textAlign: 'center', color: D.textMut, fontSize: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                        {search ? <SearchIcon size={22} /> : <InboxIcon size={22} />}
+                        {search ? `Nenhum resultado para "${search}"` : 'Nenhum lead cadastrado'}
                       </div>
                     )}
                     {totalPages > 1 && (
                       <div style={{ padding: '14px 18px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                          style={{ padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, background: page === 1 ? 'none' : D.card, color: page === 1 ? D.textMut : D.textSec, border: `1px solid ${page === 1 ? 'transparent' : D.border}`, cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.4 : 1 }}>← Anterior</button>
+                          style={{ padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5, background: page === 1 ? 'none' : D.card, color: page === 1 ? D.textMut : D.textSec, border: `1px solid ${page === 1 ? 'transparent' : D.border}`, cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.4 : 1 }}><ArrowLeftIcon size={13} /> Anterior</button>
                         <span style={{ color: D.textMut, fontSize: 12 }}>Página {page} de {totalPages}</span>
                         <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                          style={{ padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, background: page === totalPages ? 'none' : D.card, color: page === totalPages ? D.textMut : D.textSec, border: `1px solid ${page === totalPages ? 'transparent' : D.border}`, cursor: page === totalPages ? 'default' : 'pointer', opacity: page === totalPages ? 0.4 : 1 }}>Próxima →</button>
+                          style={{ padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5, background: page === totalPages ? 'none' : D.card, color: page === totalPages ? D.textMut : D.textSec, border: `1px solid ${page === totalPages ? 'transparent' : D.border}`, cursor: page === totalPages ? 'default' : 'pointer', opacity: page === totalPages ? 0.4 : 1 }}>Próxima <ArrowRightIcon size={13} /></button>
                       </div>
                     )}
                   </div>

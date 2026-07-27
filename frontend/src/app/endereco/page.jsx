@@ -10,6 +10,7 @@ import {
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Chat from '@/components/Chat';
 import BrandLogo from '@/components/BrandLogo';
+import { ArrowLeftIcon } from '@/components/icons';
 
 // ─── Máscara de CEP ───────────────────────────────────────────────────────────
 function maskCEP(v) {
@@ -174,7 +175,7 @@ export default function EnderecoPage() {
           onClick={() => router.back()}
           className="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 transition-colors text-sm"
         >
-          ← Voltar
+          <ArrowLeftIcon size={15} /> Voltar
         </button>
 
         <BrandLogo />

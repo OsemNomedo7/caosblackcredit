@@ -2,18 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircleIcon, PartyIcon, LightningIcon, TrophyIcon, CardIcon, RocketIcon, StarIcon, UnlockIcon } from './icons';
 
 const NOTIFICATIONS = [
-  { name: 'Carlos M.', city: 'São Paulo, SP', action: 'foi aprovado', detail: 'limite de R$2.000', icon: '✅' },
-  { name: 'Juliana F.', city: 'Belo Horizonte, MG', action: 'recebeu aumento de limite', detail: '+R$500', icon: '🎉' },
-  { name: 'Roberto S.', city: 'Curitiba, PR', action: 'acabou de solicitar', detail: 'cartão aprovado em 2min', icon: '⚡' },
-  { name: 'Amanda L.', city: 'Salvador, BA', action: 'foi aprovada mesmo negativada', detail: 'limite de R$2.000', icon: '🏆' },
-  { name: 'Felipe A.', city: 'Rio de Janeiro, RJ', action: 'recebeu o cartão', detail: 'em 3 dias úteis', icon: '💳' },
-  { name: 'Mariana C.', city: 'Fortaleza, CE', action: 'foi aprovada', detail: 'score melhorado', icon: '✅' },
-  { name: 'Diego R.', city: 'Porto Alegre, RS', action: 'solicitou o cartão', detail: 'aprovação imediata', icon: '🚀' },
-  { name: 'Fernanda B.', city: 'Recife, PE', action: 'recebeu aprovação', detail: 'limite de R$1.500', icon: '🎊' },
-  { name: 'Lucas T.', city: 'Manaus, AM', action: 'foi aprovado', detail: 'mesmo com CPF restrito', icon: '⭐' },
-  { name: 'Patricia M.', city: 'Brasília, DF', action: 'desbloqueou o limite', detail: 'R$2.000 disponíveis', icon: '🔓' },
+  { name: 'Carlos M.', city: 'São Paulo, SP', action: 'foi aprovado', detail: 'limite de R$2.000', icon: CheckCircleIcon },
+  { name: 'Juliana F.', city: 'Belo Horizonte, MG', action: 'recebeu aumento de limite', detail: '+R$500', icon: PartyIcon },
+  { name: 'Roberto S.', city: 'Curitiba, PR', action: 'acabou de solicitar', detail: 'cartão aprovado em 2min', icon: LightningIcon },
+  { name: 'Amanda L.', city: 'Salvador, BA', action: 'foi aprovada mesmo negativada', detail: 'limite de R$2.000', icon: TrophyIcon },
+  { name: 'Felipe A.', city: 'Rio de Janeiro, RJ', action: 'recebeu o cartão', detail: 'em 3 dias úteis', icon: CardIcon },
+  { name: 'Mariana C.', city: 'Fortaleza, CE', action: 'foi aprovada', detail: 'score melhorado', icon: CheckCircleIcon },
+  { name: 'Diego R.', city: 'Porto Alegre, RS', action: 'solicitou o cartão', detail: 'aprovação imediata', icon: RocketIcon },
+  { name: 'Fernanda B.', city: 'Recife, PE', action: 'recebeu aprovação', detail: 'limite de R$1.500', icon: PartyIcon },
+  { name: 'Lucas T.', city: 'Manaus, AM', action: 'foi aprovado', detail: 'mesmo com CPF restrito', icon: StarIcon },
+  { name: 'Patricia M.', city: 'Brasília, DF', action: 'desbloqueou o limite', detail: 'R$2.000 disponíveis', icon: UnlockIcon },
 ];
 
 function getRandomNotification(exclude) {
@@ -63,8 +64,8 @@ export function ToastNotifications() {
             className="glass-dark rounded-2xl p-4 shadow-2xl"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-lg flex-shrink-0">
-                {notification.icon}
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white flex-shrink-0">
+                <notification.icon size={18} strokeWidth={1.9} />
               </div>
               <div>
                 <p className="text-gray-900 text-sm font-semibold">{notification.name}</p>
@@ -218,9 +219,9 @@ export function Testimonials() {
             </div>
           </div>
 
-          <div className="flex gap-0.5 mb-3">
+          <div className="flex gap-0.5 mb-3 text-yellow-400">
             {Array.from({ length: r.rating }).map((_, j) => (
-              <span key={j} className="text-yellow-400 text-sm">★</span>
+              <StarIcon key={j} size={14} />
             ))}
           </div>
 

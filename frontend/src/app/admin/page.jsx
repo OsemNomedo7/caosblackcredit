@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { adminLogin, verifyToken } from '@/lib/api';
+import { UserIcon, LockIcon, EyeIcon, EyeOffIcon, WarningIcon, LightningIcon } from '@/components/icons';
 
 // Partícula de relâmpago SVG inline
 function LightningParticle({ style }) {
@@ -191,7 +192,7 @@ export default function AdminLoginPage() {
                       boxShadow: focused === 'username' ? '0 0 0 3px rgba(0,180,255,0.08), inset 0 0 20px rgba(0,180,255,0.03)' : 'none',
                     }}
                   />
-                  <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 16, opacity: 0.5 }}>◈</span>
+                  <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, color: '#00cfff', display: 'flex' }}><UserIcon size={16} /></span>
                 </div>
               </div>
 
@@ -218,20 +219,20 @@ export default function AdminLoginPage() {
                       boxShadow: focused === 'password' ? '0 0 0 3px rgba(0,180,255,0.08), inset 0 0 20px rgba(0,180,255,0.03)' : 'none',
                     }}
                   />
-                  <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 16, opacity: 0.5 }}>🔒</span>
+                  <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, color: '#00cfff', display: 'flex' }}><LockIcon size={16} /></span>
                   <button
                     type="button"
                     onClick={() => setShowPassword(s => !s)}
                     style={{
                       position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
                       background: 'none', border: 'none', cursor: 'pointer',
-                      color: 'rgba(160,210,255,0.5)', fontSize: 14, padding: 2,
+                      color: 'rgba(160,210,255,0.5)', padding: 2, display: 'flex',
                       transition: 'color .15s',
                     }}
                     onMouseEnter={e => e.currentTarget.style.color = '#00cfff'}
                     onMouseLeave={e => e.currentTarget.style.color = 'rgba(160,210,255,0.5)'}
                   >
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                   </button>
                 </div>
               </div>
@@ -251,7 +252,7 @@ export default function AdminLoginPage() {
                       display: 'flex', alignItems: 'center', gap: 8,
                     }}
                   >
-                    <span>⚠</span> {error}
+                    <WarningIcon size={15} /> {error}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -286,7 +287,9 @@ export default function AdminLoginPage() {
                     Autenticando...
                   </div>
                 ) : (
-                  <span style={{ position: 'relative' }}>⚡ Acessar Painel</span>
+                  <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <LightningIcon size={16} /> Acessar Painel
+                  </span>
                 )}
               </motion.button>
             </form>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
+import { CheckIcon } from './icons';
 
 // Gauge semicircular premium
 export default function ScoreGauge({ targetScore = 700, profile = 'negativado' }) {
@@ -208,9 +209,9 @@ export default function ScoreGauge({ targetScore = 700, profile = 'negativado' }
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-xs text-gray-600 mt-2"
+            className="text-xs text-gray-600 mt-2 flex items-center justify-center gap-1"
           >
-            Score atualizado com sucesso ✓
+            Score atualizado com sucesso <CheckIcon size={13} strokeWidth={2.2} />
           </motion.p>
         )}
       </motion.div>

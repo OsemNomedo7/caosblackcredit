@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSiteConfig, updateSiteConfig, uploadBannerFile, deleteBannerFile } from '@/lib/api';
 import { DEFAULT_SITE_CONFIG } from '@/lib/defaultConfig';
+import {
+  PaletteIcon, ImageIcon, StarIcon, HomeIcon, SparkleIcon, ClipboardIcon, ChatIcon,
+  QuestionIcon, TargetIcon, PhoneCallIcon, FileIcon, GlobeIcon, PinIcon, LockIcon,
+  RocketIcon, CardIcon, CloseIcon, WarningIcon, UndoIcon, CheckIcon, SaveIcon, BulbIcon,
+  BENEFIT_ICONS, BENEFIT_ICON_KEYS,
+} from '@/components/icons';
+
+function Spinner({ size = 12, color = '#fff' }) {
+  return <span style={{ display: 'inline-block', width: size, height: size, borderRadius: '50%', border: `2px solid ${color}40`, borderTopColor: color, animation: 'spin 0.7s linear infinite' }} />;
+}
 
 // ─── CSS COLOR → HEX (para o input type=color) ───────────────────────────────
 function toHex(css) {
@@ -99,9 +109,33 @@ function Field({ label, value, onChange, type = 'text', rows = 2, placeholder = 
           {value && (
             <div style={{ borderRadius: 10, overflow: 'hidden', border: `1px solid ${D.border}`, height: 80, position: 'relative' }}>
               <img src={value} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.style.display = 'none'} />
-              <button onClick={() => onChange('')} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}>✕ remover</button>
+              <button onClick={() => onChange('')} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}><CloseIcon size={11} /> remover</button>
             </div>
           )}
+        </div>
+      ) : type === 'icon-select' ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {BENEFIT_ICON_KEYS.map(key => {
+            const IconOpt = BENEFIT_ICONS[key];
+            const selected = value === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => onChange(key)}
+                title={key}
+                style={{
+                  width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: selected ? 'rgba(130,10,209,0.25)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${selected ? D.purple : D.border}`,
+                  color: selected ? '#d8b4fe' : D.textMut,
+                  cursor: 'pointer', transition: 'all .15s',
+                }}
+              >
+                <IconOpt size={17} />
+              </button>
+            );
+          })}
         </div>
       ) : (
         <input type={type} value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={inputBase} />
@@ -168,12 +202,12 @@ function CardPreviewMini({ cores, brandName }) {
 }
 
 // ─── SEÇÃO ────────────────────────────────────────────────────────────────────
-function Section({ title, icon, children }) {
+function Section({ title, icon: Icon, children }) {
   return (
     <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: 18, marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <div style={{ width: 3, height: 16, background: D.purple, borderRadius: 4 }} />
-        <span style={{ color: D.textPri, fontWeight: 700, fontSize: 13 }}>{icon && <span style={{ marginRight: 6 }}>{icon}</span>}{title}</span>
+        <span style={{ color: D.textPri, fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 7 }}>{Icon && <Icon size={14} />}{title}</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>{children}</div>
     </div>
@@ -232,8 +266,8 @@ function BannerBlock({ label, urlKey, opacityKey, values, onChange }) {
         <div style={{ borderRadius: 10, overflow: 'hidden', border: `1px solid ${D.border}`, height: 90, position: 'relative', marginBottom: 8 }}>
           <img src={currentUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.style.display = 'none'} />
           <button onClick={handleRemove}
-            style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
-            ✕ remover
+            style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <CloseIcon size={11} /> remover
           </button>
         </div>
       ) : (
@@ -256,7 +290,7 @@ function BannerBlock({ label, urlKey, opacityKey, values, onChange }) {
             </>
           ) : (
             <>
-              <span style={{ fontSize: 22 }}>🖼️</span>
+              <span style={{ color: D.textMut, display: 'flex' }}><ImageIcon size={24} strokeWidth={1.4} /></span>
               <span style={{ color: D.textMut, fontSize: 11, textAlign: 'center', lineHeight: 1.4 }}>
                 Clique para enviar imagem<br />
                 <span style={{ fontSize: 10, opacity: 0.6 }}>JPG, PNG, GIF, WEBP, SVG, AVIF, BMP, HEIC, JXL · máx 15 MB</span>
@@ -266,7 +300,7 @@ function BannerBlock({ label, urlKey, opacityKey, values, onChange }) {
         </label>
       )}
 
-      {uploadErr && <p style={{ color: D.red, fontSize: 11, marginBottom: 8 }}>⚠ {uploadErr}</p>}
+      {uploadErr && <p style={{ color: D.red, fontSize: 11, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}><WarningIcon size={12} /> {uploadErr}</p>}
 
       {/* URL manual (alternativa) */}
       <div>
@@ -332,8 +366,8 @@ function LogoBlock({ urlKey, values, onChange }) {
           <>
             <img src={currentUrl} alt="logo" style={{ height: 36, maxWidth: 140, objectFit: 'contain' }} />
             <button onClick={handleRemove}
-              style={{ marginLeft: 'auto', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
-              ✕ remover
+              style={{ marginLeft: 'auto', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <CloseIcon size={11} /> remover
             </button>
           </>
         ) : (
@@ -356,12 +390,12 @@ function LogoBlock({ urlKey, values, onChange }) {
               <span style={{ color: D.textMut, fontSize: 11 }}>{progress}% enviando...</span>
             </>
           ) : (
-            <span style={{ color: D.textMut, fontSize: 11 }}>🖼️ Clique para enviar a logo · PNG, SVG, WebP recomendado</span>
+            <span style={{ color: D.textMut, fontSize: 11, display: 'flex', alignItems: 'center', gap: 5 }}><ImageIcon size={14} /> Clique para enviar a logo · PNG, SVG, WebP recomendado</span>
           )}
         </label>
       )}
 
-      {uploadErr && <p style={{ color: D.red, fontSize: 11, marginBottom: 8 }}>⚠ {uploadErr}</p>}
+      {uploadErr && <p style={{ color: D.red, fontSize: 11, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}><WarningIcon size={12} /> {uploadErr}</p>}
 
       <div>
         <label style={{ display: 'block', color: D.textMut, fontSize: 10, fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -385,8 +419,8 @@ function EditableList({ items, fields, onChange, addLabel, newItem }) {
             <span style={{ color: D.textMut, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Item {i + 1}</span>
             <button
               onClick={() => onChange(items.filter((_, j) => j !== i))}
-              style={{ color: D.red, background: 'rgba(239,68,68,0.1)', border: `1px solid rgba(239,68,68,0.2)`, borderRadius: 6, padding: '3px 8px', fontSize: 11, cursor: 'pointer' }}
-            >✕ remover</button>
+              style={{ color: D.red, background: 'rgba(239,68,68,0.1)', border: `1px solid rgba(239,68,68,0.2)`, borderRadius: 6, padding: '3px 8px', fontSize: 11, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            ><CloseIcon size={11} /> remover</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {fields.map(f => (
@@ -412,17 +446,17 @@ function EditableList({ items, fields, onChange, addLabel, newItem }) {
 
 // ─── SUB-TABS ─────────────────────────────────────────────────────────────────
 const SUB_TABS = [
-  { id: 'cores',       icon: '🎨', label: 'Cores' },
-  { id: 'banners',     icon: '🖼️', label: 'Banners' },
-  { id: 'marca',       icon: '✦',  label: 'Marca' },
-  { id: 'hero',        icon: '🏠', label: 'Hero' },
-  { id: 'beneficios',  icon: '✨', label: 'Benefícios' },
-  { id: 'passos',      icon: '📋', label: 'Passos' },
-  { id: 'depoimentos', icon: '💬', label: 'Depoimentos' },
-  { id: 'faq',         icon: '❓', label: 'FAQ' },
-  { id: 'funil',       icon: '🎯', label: 'Funil' },
-  { id: 'suporte',     icon: '📞', label: 'Suporte' },
-  { id: 'rodape',      icon: '📄', label: 'Rodapé' },
+  { id: 'cores',       icon: PaletteIcon, label: 'Cores' },
+  { id: 'banners',     icon: ImageIcon, label: 'Banners' },
+  { id: 'marca',       icon: StarIcon,  label: 'Marca' },
+  { id: 'hero',        icon: HomeIcon, label: 'Hero' },
+  { id: 'beneficios',  icon: SparkleIcon, label: 'Benefícios' },
+  { id: 'passos',      icon: ClipboardIcon, label: 'Passos' },
+  { id: 'depoimentos', icon: ChatIcon, label: 'Depoimentos' },
+  { id: 'faq',         icon: QuestionIcon, label: 'FAQ' },
+  { id: 'funil',       icon: TargetIcon, label: 'Funil' },
+  { id: 'suporte',     icon: PhoneCallIcon, label: 'Suporte' },
+  { id: 'rodape',      icon: FileIcon, label: 'Rodapé' },
 ];
 
 // ─── PANEL ────────────────────────────────────────────────────────────────────
@@ -466,7 +500,7 @@ export default function PersonalizacaoPanel() {
         color: saved ? D.green : '#c084fc',
         border: `1px solid ${saved ? D.greenBdr : 'rgba(130,10,209,0.4)'}`,
       }}
-    >{saving ? '⏳ Salvando...' : saved ? '✓ Salvo!' : '💾 Salvar alterações'}</motion.button>
+    >{saving ? <><Spinner color="#c084fc" /> Salvando...</> : saved ? <><CheckIcon size={15} /> Salvo!</> : <><SaveIcon size={15} /> Salvar alterações</>}</motion.button>
   );
 
   return (
@@ -479,8 +513,8 @@ export default function PersonalizacaoPanel() {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={handleReset}
-            style={{ padding: '9px 16px', borderRadius: 10, fontSize: 12, fontWeight: 600, color: D.textMut, background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer' }}
-          >↺ Restaurar padrão</button>
+            style={{ padding: '9px 16px', borderRadius: 10, fontSize: 12, fontWeight: 600, color: D.textMut, background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          ><UndoIcon size={13} /> Restaurar padrão</button>
           <SaveBtn />
         </div>
       </div>
@@ -496,7 +530,7 @@ export default function PersonalizacaoPanel() {
               color: subTab === t.id ? '#d8b4fe' : D.textMut,
               border: `1px solid ${subTab === t.id ? 'rgba(130,10,209,0.4)' : 'transparent'}`,
             }}
-          ><span>{t.icon}</span><span>{t.label}</span></button>
+          ><t.icon size={14} /><span>{t.label}</span></button>
         ))}
       </div>
 
@@ -507,14 +541,14 @@ export default function PersonalizacaoPanel() {
           {/* ── CORES ────────────────────────────────────────────────── */}
           {subTab === 'cores' && (
             <div>
-              <Section title="Identidade" icon="🎨">
+              <Section title="Identidade" icon={PaletteIcon}>
                 <Grid2>
                   <Field label="Cor primária (botões, destaques)" value={config.cores?.primaria} type="color" onChange={v => set('cores', 'primaria', v)} />
                   <Field label="Cor secundária (gradientes)" value={config.cores?.segundaria} type="color" onChange={v => set('cores', 'segundaria', v)} />
                 </Grid2>
               </Section>
 
-              <Section title="Página" icon="🌐">
+              <Section title="Página" icon={GlobeIcon}>
                 <Grid2>
                   <Field label="Background da página" value={config.cores?.background} type="color-text" onChange={v => set('cores', 'background', v)} hint="Ex: #ffffff, rgba(248,240,255,1)" />
                   <Field label="Cor dos títulos" value={config.cores?.textoTitulo} type="color-text" onChange={v => set('cores', 'textoTitulo', v)} />
@@ -523,7 +557,7 @@ export default function PersonalizacaoPanel() {
                 </Grid2>
               </Section>
 
-              <Section title="Navbar" icon="📌">
+              <Section title="Navbar" icon={PinIcon}>
                 <Grid2>
                   <Field label="Background da navbar" value={config.cores?.navbarBg} type="color-text" onChange={v => set('cores', 'navbarBg', v)} />
                   <Field label="Cor do texto da navbar" value={config.cores?.navbarTexto} type="color-text" onChange={v => set('cores', 'navbarTexto', v)} />
@@ -531,11 +565,11 @@ export default function PersonalizacaoPanel() {
                 </Grid2>
               </Section>
 
-              <Section title="Seção Hero" icon="🏠">
+              <Section title="Seção Hero" icon={HomeIcon}>
                 <Field label="Background do hero" value={config.cores?.heroBg} type="color-text" onChange={v => set('cores', 'heroBg', v)} hint="transparent para usar o fundo da página" />
               </Section>
 
-              <Section title="Seção Benefícios" icon="✨">
+              <Section title="Seção Benefícios" icon={SparkleIcon}>
                 <Grid2>
                   <Field label="Background da seção" value={config.cores?.beneficiosBg} type="color-text" onChange={v => set('cores', 'beneficiosBg', v)} />
                   <Field label="Background dos cards" value={config.cores?.cardBg} type="color-text" onChange={v => set('cores', 'cardBg', v)} />
@@ -543,30 +577,30 @@ export default function PersonalizacaoPanel() {
                 </Grid2>
               </Section>
 
-              <Section title="Seção Passos" icon="📋">
+              <Section title="Seção Passos" icon={ClipboardIcon}>
                 <Field label="Background da seção" value={config.cores?.passosBg} type="color-text" onChange={v => set('cores', 'passosBg', v)} />
               </Section>
 
-              <Section title="Seção Depoimentos" icon="💬">
+              <Section title="Seção Depoimentos" icon={ChatIcon}>
                 <Field label="Background da seção" value={config.cores?.depoimentosBg} type="color-text" onChange={v => set('cores', 'depoimentosBg', v)} />
               </Section>
 
-              <Section title="Seção Segurança" icon="🔒">
+              <Section title="Seção Segurança" icon={LockIcon}>
                 <Field label="Background do card de segurança" value={config.cores?.segurancaBg} type="color-text" onChange={v => set('cores', 'segurancaBg', v)} />
               </Section>
 
-              <Section title="Seção FAQ" icon="❓">
+              <Section title="Seção FAQ" icon={QuestionIcon}>
                 <Field label="Background da seção" value={config.cores?.faqBg} type="color-text" onChange={v => set('cores', 'faqBg', v)} />
               </Section>
 
-              <Section title="Seção CTA Final" icon="🚀">
+              <Section title="Seção CTA Final" icon={RocketIcon}>
                 <Grid2>
                   <Field label="Background do card CTA" value={config.cores?.ctaBg} type="color-text" onChange={v => set('cores', 'ctaBg', v)} />
                   <Field label="Borda do card CTA" value={config.cores?.ctaBorda} type="color-text" onChange={v => set('cores', 'ctaBorda', v)} />
                 </Grid2>
               </Section>
 
-              <Section title="Footer" icon="📄">
+              <Section title="Footer" icon={FileIcon}>
                 <Grid2>
                   <Field label="Background do footer" value={config.cores?.footerBg} type="color-text" onChange={v => set('cores', 'footerBg', v)} />
                   <Field label="Cor da borda superior" value={config.cores?.footerBorda} type="color-text" onChange={v => set('cores', 'footerBorda', v)} />
@@ -574,7 +608,7 @@ export default function PersonalizacaoPanel() {
                 </Grid2>
               </Section>
 
-              <Section title="Cartão de Crédito" icon="💳">
+              <Section title="Cartão de Crédito" icon={CardIcon}>
                 <p style={{ color: D.textMut, fontSize: 12 }}>
                   Gradiente do cartão exibido na página inicial e na página de emissão. Clique na caixinha para abrir a paleta.
                 </p>
@@ -592,13 +626,13 @@ export default function PersonalizacaoPanel() {
           {subTab === 'banners' && (
             <div>
               <div style={{ background: 'rgba(130,10,209,0.07)', border: `1px solid rgba(130,10,209,0.2)`, borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
-                <p style={{ color: '#c084fc', fontSize: 12, margin: 0 }}>
-                  💡 Cole a URL de qualquer imagem pública (JPG, PNG, WebP). O banner é exibido como fundo da seção com a opacidade configurável. Use imagens de alta qualidade para melhor resultado.
+                <p style={{ color: '#c084fc', fontSize: 12, margin: 0, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                  <BulbIcon size={15} style={{ flexShrink: 0, marginTop: 1 }} /> Cole a URL de qualquer imagem pública (JPG, PNG, WebP). O banner é exibido como fundo da seção com a opacidade configurável. Use imagens de alta qualidade para melhor resultado.
                 </p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <Section title="Hero — Banner de fundo" icon="🏠">
+                <Section title="Hero — Banner de fundo" icon={HomeIcon}>
                   <BannerBlock label="Imagem de fundo do hero (Desktop 16:9)" urlKey="hero" opacityKey="heroBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                   <div style={{ marginTop: 16 }}>
@@ -610,42 +644,42 @@ export default function PersonalizacaoPanel() {
                   </div>
                 </Section>
 
-                <Section title="Navbar — Logo" icon="📌">
+                <Section title="Navbar — Logo" icon={PinIcon}>
                   <p style={{ color: D.textMut, fontSize: 11, marginBottom: 8 }}>A logo aparece no canto esquerdo da barra de navegação. Recomendado: fundo transparente (PNG/SVG), altura mínima de 80px.</p>
                   <LogoBlock urlKey="navbar" values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Seção Benefícios" icon="✨">
+                <Section title="Seção Benefícios" icon={SparkleIcon}>
                   <BannerBlock label="Imagem de fundo da seção" urlKey="beneficios" opacityKey="beneficiosBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Seção Passos / Como Funciona" icon="📋">
+                <Section title="Seção Passos / Como Funciona" icon={ClipboardIcon}>
                   <BannerBlock label="Imagem de fundo da seção" urlKey="passos" opacityKey="passosBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Seção Depoimentos" icon="💬">
+                <Section title="Seção Depoimentos" icon={ChatIcon}>
                   <BannerBlock label="Imagem de fundo da seção" urlKey="depoimentos" opacityKey="depoimentosBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Seção Segurança" icon="🔒">
+                <Section title="Seção Segurança" icon={LockIcon}>
                   <BannerBlock label="Imagem de fundo da seção" urlKey="seguranca" opacityKey="segurancaBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Seção FAQ" icon="❓">
+                <Section title="Seção FAQ" icon={QuestionIcon}>
                   <BannerBlock label="Imagem de fundo da seção" urlKey="faq" opacityKey="faqBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="CTA Final" icon="🚀">
+                <Section title="CTA Final" icon={RocketIcon}>
                   <BannerBlock label="Imagem de fundo do CTA" urlKey="cta" opacityKey="ctaBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
 
-                <Section title="Footer" icon="📄">
+                <Section title="Footer" icon={FileIcon}>
                   <BannerBlock label="Imagem de fundo do footer" urlKey="footer" opacityKey="footerBgOpacity"
                     values={config.banners || {}} onChange={(k, v) => set('banners', k, v)} />
                 </Section>
@@ -656,7 +690,7 @@ export default function PersonalizacaoPanel() {
           {/* ── MARCA ────────────────────────────────────────────────── */}
           {subTab === 'marca' && (
             <div>
-              <Section title="Identidade da marca" icon="✦">
+              <Section title="Identidade da marca" icon={StarIcon}>
                 <Field label="Nome da marca" value={config.brand?.name} onChange={v => set('brand', 'name', v)} placeholder="CreditoFácil" />
                 <Field label="Tagline / Slogan" value={config.brand?.tagline} onChange={v => set('brand', 'tagline', v)} placeholder="Cartão para negativados" />
               </Section>
@@ -666,7 +700,7 @@ export default function PersonalizacaoPanel() {
           {/* ── HERO ─────────────────────────────────────────────────── */}
           {subTab === 'hero' && (
             <div>
-              <Section title="Título principal (3 linhas)" icon="🏠">
+              <Section title="Título principal (3 linhas)" icon={HomeIcon}>
                 <Field label="Linha 1" value={config.hero?.titulo1} onChange={v => set('hero', 'titulo1', v)} placeholder="Cartão de crédito" />
                 <Field label="Linha 2" value={config.hero?.titulo2} onChange={v => set('hero', 'titulo2', v)} placeholder="aprovado mesmo" />
                 <Field label="Linha 3 (destaque roxo)" value={config.hero?.titulo3} onChange={v => set('hero', 'titulo3', v)} placeholder="negativado" />
@@ -697,10 +731,10 @@ export default function PersonalizacaoPanel() {
               </div>
               <EditableList
                 items={config.beneficios || []}
-                fields={[{ key: 'icon', label: 'Emoji / Ícone' }, { key: 'titulo', label: 'Título' }, { key: 'desc', label: 'Descrição' }]}
+                fields={[{ key: 'icon', label: 'Ícone', type: 'icon-select' }, { key: 'titulo', label: 'Título' }, { key: 'desc', label: 'Descrição' }]}
                 onChange={v => setList('beneficios', v)}
                 addLabel="Adicionar benefício"
-                newItem={{ icon: '⭐', titulo: 'Novo benefício', desc: 'Descrição do benefício' }}
+                newItem={{ icon: 'sparkle', titulo: 'Novo benefício', desc: 'Descrição do benefício' }}
               />
             </div>
           )}
@@ -779,7 +813,7 @@ export default function PersonalizacaoPanel() {
           {/* ── SUPORTE ──────────────────────────────────────────────── */}
           {subTab === 'suporte' && (
             <div>
-              <Section title="Informações de suporte" icon="📞">
+              <Section title="Informações de suporte" icon={PhoneCallIcon}>
                 <Grid2>
                   <Field label="WhatsApp" value={config.suporte?.whatsapp} onChange={v => set('suporte', 'whatsapp', v)} placeholder="(11) 99999-9999" />
                   <Field label="E-mail" value={config.suporte?.email} onChange={v => set('suporte', 'email', v)} placeholder="suporte@creditofacil.com" />
@@ -796,7 +830,7 @@ export default function PersonalizacaoPanel() {
           {/* ── RODAPÉ ───────────────────────────────────────────────── */}
           {subTab === 'rodape' && (
             <div>
-              <Section title="Rodapé" icon="📄">
+              <Section title="Rodapé" icon={FileIcon}>
                 <Field label="Texto de copyright" value={config.rodape?.texto} onChange={v => set('rodape', 'texto', v)} placeholder="© 2024 CreditoFácil. Todos os direitos reservados." />
                 <Field label="Descrição / aviso legal" value={config.rodape?.descricao} type="textarea" rows={2} onChange={v => set('rodape', 'descricao', v)} />
               </Section>

@@ -76,12 +76,12 @@ export const DEFAULT_SITE_CONFIG = {
   },
 
   beneficios: [
-    { icon: '💳', titulo: 'Cartão físico Mastercard', desc: 'Aceito em todo o Brasil e no exterior' },
-    { icon: '🚀', titulo: 'Aprovação em minutos', desc: 'Análise automatizada, sem burocracia' },
-    { icon: '🔒', titulo: 'Sem consulta SPC/Serasa', desc: 'Negativados são bem-vindos aqui' },
-    { icon: '💰', titulo: 'Até R$2.000 de limite', desc: 'Limite real para suas compras do dia a dia' },
-    { icon: '📱', titulo: 'Controle pelo app', desc: 'Gerencie tudo pelo celular, 24h por dia' },
-    { icon: '✨', titulo: 'Sem anuidade no 1º ano', desc: 'Sem surpresas na fatura do cartão' },
+    { icon: 'card', titulo: 'Cartão físico Mastercard', desc: 'Aceito em todo o Brasil e no exterior' },
+    { icon: 'rocket', titulo: 'Aprovação em minutos', desc: 'Análise automatizada, sem burocracia' },
+    { icon: 'lock', titulo: 'Sem consulta SPC/Serasa', desc: 'Negativados são bem-vindos aqui' },
+    { icon: 'money', titulo: 'Até R$2.000 de limite', desc: 'Limite real para suas compras do dia a dia' },
+    { icon: 'phone', titulo: 'Controle pelo app', desc: 'Gerencie tudo pelo celular, 24h por dia' },
+    { icon: 'sparkle', titulo: 'Sem anuidade no 1º ano', desc: 'Sem surpresas na fatura do cartão' },
   ],
 
   passos: [
