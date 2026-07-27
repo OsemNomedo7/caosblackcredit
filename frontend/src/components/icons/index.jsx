@@ -625,3 +625,15 @@ export const BENEFIT_ICONS = {
 };
 
 export const BENEFIT_ICON_KEYS = Object.keys(BENEFIT_ICONS);
+
+// Mapa usado pelos passos do "Como funciona" (icon-key -> componente)
+export const STEP_ICONS = {
+  user: UserIcon,
+  clipboard: ClipboardIcon,
+  search: SearchIcon,
+  package: PackageIcon,
+  card: CardIcon,
+  check: CheckIcon,
+};
+
+export const STEP_ICON_KEYS = Object.keys(STEP_ICONS);

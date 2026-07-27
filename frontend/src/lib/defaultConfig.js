@@ -85,10 +85,10 @@ export const DEFAULT_SITE_CONFIG = {
   ],
 
   passos: [
-    { numero: '01', titulo: 'Escolha seu perfil', desc: 'Selecione se já é cliente ou se está negativado' },
-    { numero: '02', titulo: 'Informe seus dados', desc: 'Apenas nome e CPF. Rápido e seguro.' },
-    { numero: '03', titulo: 'Análise imediata', desc: 'Seu score é calculado em segundos' },
-    { numero: '04', titulo: 'Receba seu cartão', desc: 'Pague a taxa e receba em casa em até 7 dias' },
+    { icon: 'user', numero: '01', titulo: 'Escolha seu perfil', desc: 'Selecione se já é cliente ou se está negativado' },
+    { icon: 'clipboard', numero: '02', titulo: 'Informe seus dados', desc: 'Apenas nome e CPF. Rápido e seguro.' },
+    { icon: 'search', numero: '03', titulo: 'Análise imediata', desc: 'Seu score é calculado em segundos' },
+    { icon: 'package', numero: '04', titulo: 'Receba seu cartão', desc: 'Pague a taxa e receba em casa em até 7 dias' },
   ],
 
   depoimentos: [

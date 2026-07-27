@@ -9,7 +9,7 @@ import { ToastNotifications, ApprovedCounter, OnlineCounter, Testimonials } from
 import Chat from '@/components/Chat';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import BrandLogo from '@/components/BrandLogo';
-import { BENEFIT_ICONS, SparkleIcon, ClipboardIcon, StarIcon, LockIcon, ArrowRightIcon, ChevronDownIcon } from '@/components/icons';
+import { BENEFIT_ICONS, STEP_ICONS, SparkleIcon, ClipboardIcon, StarIcon, LockIcon, ArrowRightIcon, ChevronDownIcon } from '@/components/icons';
 
 function FAQItem({ q, a, cardBg, cardBorda, textoTitulo, textoCorpo, primaria }) {
   const [open, setOpen] = useState(false);
@@ -354,7 +354,10 @@ export default function LandingPage() {
             {passos.map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.15 }} viewport={{ once: true }} className="relative">
                 <div className="rounded-2xl p-6 text-center h-full" style={{ background: c.cardBg || 'rgba(255,255,255,0.85)', border: `1px solid ${c.cardBorda || 'rgba(130,10,209,0.12)'}`, backdropFilter: 'blur(8px)' }}>
-                  <div className="mb-4" style={{ color: c.primaria || '#820AD1' }}>{s.icon || <ClipboardIcon size={32} strokeWidth={1.5} />}</div>
+                  {(() => {
+                    const StepIcon = STEP_ICONS[s.icon] || ClipboardIcon;
+                    return <div className="mb-4" style={{ color: c.primaria || '#820AD1' }}><StepIcon size={32} strokeWidth={1.5} /></div>;
+                  })()}
                   <div className="text-xs font-bold tracking-widest mb-2" style={{ color: c.primaria || '#820AD1' }}>{s.numero || s.n}</div>
                   <h3 className="font-bold mb-2" style={{ color: c.textoTitulo || '#111827' }}>{s.titulo || s.title}</h3>
                   <p className="text-sm" style={{ color: c.textoCorpo || '#6b7280' }}>{s.desc}</p>
