@@ -9,6 +9,7 @@ const QRCode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const { createClient } = require('@libsql/client');
 require('dotenv').config();
 
 const app = express();
@@ -21,7 +22,6 @@ const isAllowedOrigin = (origin) =>
   !origin || origin.startsWith('https://') || origin.includes('localhost');
 const JWT_SECRET = process.env.JWT_SECRET || 'projetocredito_secret_2024';
 const PORT = process.env.PORT || 3001;
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'database.bin');
 
 // ─── UPLOADS ──────────────────────────────────────────────────────────────────
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
@@ -59,25 +59,49 @@ const io = new Server(server, {
   },
 });
 
-// ─── DATABASE (sql.js) ───────────────────────────────────────────────────────
-let SQL, db;
+// ─── DATABASE (Turso / libSQL) ────────────────────────────────────────────────
+// Sem TURSO_DATABASE_URL definido, cai para um arquivo SQLite local (dev).
+const client = createClient({
+  url: process.env.TURSO_DATABASE_URL || `file:${path.join(__dirname, 'database.db')}`,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+// Envolve rotas async para que erros caiam no handler de erro do Express
+const ah = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+
+function rowToObject(row, columns) {
+  const obj = {};
+  columns.forEach((col, i) => { obj[col] = row[i]; });
+  return obj;
+}
+
+async function queryAll(sql, params = []) {
+  try {
+    const result = await client.execute({ sql, args: params });
+    return result.rows.map(row => rowToObject(row, result.columns));
+  } catch (e) {
+    console.error('queryAll error:', e, sql);
+    return [];
+  }
+}
+
+async function queryOne(sql, params = []) {
+  const rows = await queryAll(sql, params);
+  return rows[0] || null;
+}
+
+async function execute(sql, params = []) {
+  const result = await client.execute({ sql, args: params });
+  return Number(result.lastInsertRowid ?? 0);
+}
+
+async function getSettings() {
+  const rows = await queryAll('SELECT key, value FROM settings');
+  return Object.fromEntries(rows.map(r => [r.key, r.value]));
+}
 
 async function initDB() {
-  const initSqlJs = require('sql.js');
-  SQL = await initSqlJs();
-
-  // Carrega banco existente ou cria novo
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-    console.log('📂 Banco de dados carregado');
-  } else {
-    db = new SQL.Database();
-    console.log('🆕 Novo banco de dados criado');
-  }
-
-  // Cria tabelas
-  db.run(`
+  await client.executeMultiple(`
     CREATE TABLE IF NOT EXISTS leads (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -112,18 +136,18 @@ async function initDB() {
   `);
 
   // Migração: adiciona colunas novas em bancos existentes
-  try { db.run('ALTER TABLE leads ADD COLUMN location TEXT'); } catch { /* já existe */ }
+  try { await client.execute('ALTER TABLE leads ADD COLUMN location TEXT'); } catch { /* já existe */ }
 
   // Admin padrão
-  const adminRows = db.exec("SELECT id FROM admin_users WHERE username = 'admin'");
-  if (!adminRows.length || !adminRows[0].values.length) {
+  const adminUser = await queryOne("SELECT id FROM admin_users WHERE username = 'admin'");
+  if (!adminUser) {
     const hashed = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);
-    db.run('INSERT INTO admin_users (username, password) VALUES (?, ?)', ['admin', hashed]);
+    await execute('INSERT INTO admin_users (username, password) VALUES (?, ?)', ['admin', hashed]);
     console.log('✅ Admin criado');
   } else if (process.env.ADMIN_PASSWORD) {
     // Sempre atualiza a senha se a variável de ambiente estiver definida
     const hashed = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
-    db.run("UPDATE admin_users SET password = ? WHERE username = 'admin'", [hashed]);
+    await execute("UPDATE admin_users SET password = ? WHERE username = 'admin'", [hashed]);
     console.log('🔑 Senha do admin sincronizada com ADMIN_PASSWORD');
   }
 
@@ -208,25 +232,10 @@ async function initDB() {
       chat: { bemVindo: 'Olá! Sou a assistente virtual do CreditoFácil. Como posso te ajudar?', respostaPadrao: 'Entendo sua dúvida! Para mais informações, clique em "Quero meu cartão agora" e inicie sua análise.' },
     })],
   ];
-  defaults.forEach(([k, v]) => {
-    db.run('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', [k, v]);
-  });
-
-  saveDB();
-}
-
-// Persiste o banco em disco
-function saveDB() {
-  try {
-    const data = db.export();
-    fs.writeFileSync(DB_PATH, Buffer.from(data));
-  } catch (e) {
-    console.error('Erro ao salvar DB:', e);
+  for (const [k, v] of defaults) {
+    await execute('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', [k, v]);
   }
 }
-
-// Salva a cada 30 segundos
-setInterval(saveDB, 30000);
 
 // ─── GEOLOCALIZAÇÃO ───────────────────────────────────────────────────────────
 async function fetchGeolocation(ip) {
@@ -289,52 +298,6 @@ async function gerarPixSigiloPay(settings, total, lead) {
   });
 }
 
-// Helpers
-function queryAll(sql, params = []) {
-  try {
-    const stmt = db.prepare(sql);
-    stmt.bind(params);
-    const rows = [];
-    while (stmt.step()) {
-      rows.push(stmt.getAsObject());
-    }
-    stmt.free();
-    return rows;
-  } catch (e) {
-    console.error('queryAll error:', e, sql);
-    return [];
-  }
-}
-
-function queryOne(sql, params = []) {
-  const rows = queryAll(sql, params);
-  return rows[0] || null;
-}
-
-function execute(sql, params = []) {
-  try {
-    db.run(sql, params);
-    // Pega o last_insert_rowid usando prepared statement (mais confiável no sql.js)
-    const stmt = db.prepare('SELECT last_insert_rowid()');
-    let lastId = 0;
-    if (stmt.step()) {
-      const row = stmt.get();
-      lastId = Number(row[0]) || 0;
-    }
-    stmt.free();
-    saveDB();
-    return lastId;
-  } catch (e) {
-    console.error('execute error:', e, sql);
-    throw e;
-  }
-}
-
-function getSettings() {
-  const rows = queryAll('SELECT key, value FROM settings');
-  return Object.fromEntries(rows.map(r => [r.key, r.value]));
-}
-
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
@@ -355,22 +318,22 @@ const authMiddleware = (req, res, next) => {
 };
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', ah(async (req, res) => {
   const { username, password } = req.body;
-  const user = queryOne('SELECT * FROM admin_users WHERE username = ?', [username]);
+  const user = await queryOne('SELECT * FROM admin_users WHERE username = ?', [username]);
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).json({ error: 'Usuário ou senha incorretos' });
   }
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '12h' });
   res.json({ token, username: user.username });
-});
+}));
 
 app.get('/api/auth/verify', authMiddleware, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
 
 // ─── LEADS ────────────────────────────────────────────────────────────────────
-app.post('/api/leads', (req, res) => {
+app.post('/api/leads', ah(async (req, res) => {
   const { name, cpf, profile, sessionId } = req.body;
   if (!name || !cpf || !profile) return res.status(400).json({ error: 'Dados incompletos' });
 
@@ -378,7 +341,7 @@ app.post('/api/leads', (req, res) => {
     ? Math.floor(Math.random() * 201) + 650   // 650-850
     : Math.floor(Math.random() * 251) + 300;  // 300-550
 
-  const settings = getSettings();
+  const settings = await getSettings();
   const limitValue = parseFloat(settings.max_limit || 2000);
   const ip = (
     req.headers['cf-connecting-ip'] ||
@@ -387,7 +350,7 @@ app.post('/api/leads', (req, res) => {
     req.socket.remoteAddress || ''
   ).split(',')[0].trim();
 
-  const id = execute(
+  const id = await execute(
     'INSERT INTO leads (name, cpf, profile, score, limit_value, session_id, ip) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [name, cpf, profile, score, limitValue, sessionId || '', ip]
   );
@@ -398,30 +361,30 @@ app.post('/api/leads', (req, res) => {
   // Geolocalização assíncrona (não bloqueia a resposta)
   fetchGeolocation(ip).then(location => {
     if (location) {
-      execute('UPDATE leads SET location = ? WHERE id = ?', [location, id]);
+      return execute('UPDATE leads SET location = ? WHERE id = ?', [location, id]);
     }
   }).catch(() => {});
 
   res.json({ id, score, limit_value: limitValue });
-});
+}));
 
-app.put('/api/leads/:id', (req, res) => {
+app.put('/api/leads/:id', ah(async (req, res) => {
   const { status, payment_status } = req.body;
-  execute('UPDATE leads SET status = ?, payment_status = ? WHERE id = ?', [status || 'pending', payment_status || 'pending', req.params.id]);
+  await execute('UPDATE leads SET status = ?, payment_status = ? WHERE id = ?', [status || 'pending', payment_status || 'pending', req.params.id]);
   io.to('admin').emit('lead_updated', { id: parseInt(req.params.id), status, payment_status });
   res.json({ success: true });
-});
+}));
 
 // ─── PIX ──────────────────────────────────────────────────────────────────────
-app.post('/api/pix/generate', async (req, res) => {
+app.post('/api/pix/generate', ah(async (req, res) => {
   const { amount, leadId } = req.body;
-  const settings = getSettings();
+  const settings = await getSettings();
   const emission_fee = parseFloat(settings.emission_fee || 19.90);
   const shipping_fee = parseFloat(settings.shipping_fee || 29.90);
   const total = amount || (emission_fee + shipping_fee);
 
   // Busca dados do lead para SigiloPay
-  const lead = leadId ? queryOne('SELECT * FROM leads WHERE id = ?', [leadId]) : null;
+  const lead = leadId ? await queryOne('SELECT * FROM leads WHERE id = ?', [leadId]) : null;
 
   // Tenta SigiloPay primeiro
   try {
@@ -449,10 +412,10 @@ app.post('/api/pix/generate', async (req, res) => {
   } catch {
     res.status(500).json({ error: 'Erro ao gerar QR Code' });
   }
-});
+}));
 
 // ─── WEBHOOK SIGILOPAY ────────────────────────────────────────────────────────
-function processPaymentWebhook(body) {
+async function processPaymentWebhook(body) {
   // Extrai o leadId de múltiplas fontes possíveis
   let leadId = body.metadata?.leadId || body.leadId || null;
 
@@ -464,11 +427,11 @@ function processPaymentWebhook(body) {
 
   if (!leadId) return false;
 
-  execute(
+  await execute(
     "UPDATE leads SET payment_status = 'paid', status = 'approved' WHERE id = ?",
     [String(leadId)]
   );
-  const lead = queryOne('SELECT * FROM leads WHERE id = ?', [String(leadId)]);
+  const lead = await queryOne('SELECT * FROM leads WHERE id = ?', [String(leadId)]);
   if (lead) {
     io.to('admin').emit('lead_updated', { id: parseInt(leadId), status: 'approved', payment_status: 'paid' });
     io.to(`session_${lead.session_id}`).emit('payment_confirmed', { leadId: parseInt(leadId) });
@@ -477,10 +440,10 @@ function processPaymentWebhook(body) {
 }
 
 // Endpoint principal do webhook SigiloPay
-app.post('/api/webhook/sigilopay', (req, res) => {
+app.post('/api/webhook/sigilopay', ah(async (req, res) => {
   try {
     const body = req.body || {};
-    const settings = getSettings();
+    const settings = await getSettings();
 
     // Valida token se configurado
     const webhookToken = settings.webhook_token || '';
@@ -494,7 +457,7 @@ app.post('/api/webhook/sigilopay', (req, res) => {
     const statusPaid = ['paid', 'approved', 'completed'].includes((body.status || '').toLowerCase());
 
     if (isPaid || statusPaid) {
-      processPaymentWebhook(body);
+      await processPaymentWebhook(body);
     }
 
     res.json({ received: true });
@@ -502,22 +465,22 @@ app.post('/api/webhook/sigilopay', (req, res) => {
     console.error('Webhook error:', e);
     res.status(500).json({ error: 'Webhook error' });
   }
-});
+}));
 
 // Mantém rota antiga como alias
-app.post('/api/pix/callback', (req, res) => {
+app.post('/api/pix/callback', ah(async (req, res) => {
   try {
     const body = req.body || {};
     const status = (body.status || '').toLowerCase();
     if (status === 'paid' || status === 'approved' || status === 'completed') {
-      processPaymentWebhook(body);
+      await processPaymentWebhook(body);
     }
     res.json({ received: true });
   } catch (e) {
     console.error('Callback error:', e);
     res.status(500).json({ error: 'Callback error' });
   }
-});
+}));
 
 function gerarPixSimples(chave, nome, valor) {
   const f = (id, v) => `${id}${String(v).length.toString().padStart(2, '0')}${v}`;
@@ -540,13 +503,13 @@ function crc16(str) {
 }
 
 // ─── ADMIN ────────────────────────────────────────────────────────────────────
-app.get('/api/admin/dashboard', authMiddleware, (req, res) => {
-  const total = queryOne('SELECT COUNT(*) as c FROM leads')?.c || 0;
-  const paid  = queryOne("SELECT COUNT(*) as c FROM leads WHERE payment_status = 'paid'")?.c || 0;
-  const today = queryOne("SELECT COUNT(*) as c FROM leads WHERE date(created_at) = date('now','localtime')")?.c || 0;
-  const recent = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 15');
-  const profileStats = queryAll('SELECT profile, COUNT(*) as count FROM leads GROUP BY profile');
-  const leadsByDay = queryAll(`
+app.get('/api/admin/dashboard', authMiddleware, ah(async (req, res) => {
+  const total = (await queryOne('SELECT COUNT(*) as c FROM leads'))?.c || 0;
+  const paid  = (await queryOne("SELECT COUNT(*) as c FROM leads WHERE payment_status = 'paid'"))?.c || 0;
+  const today = (await queryOne("SELECT COUNT(*) as c FROM leads WHERE date(created_at) = date('now','localtime')"))?.c || 0;
+  const recent = await queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 15');
+  const profileStats = await queryAll('SELECT profile, COUNT(*) as count FROM leads GROUP BY profile');
+  const leadsByDay = await queryAll(`
     SELECT
       date(created_at, 'localtime') as day,
       COUNT(*) as total,
@@ -556,39 +519,39 @@ app.get('/api/admin/dashboard', authMiddleware, (req, res) => {
     GROUP BY date(created_at, 'localtime')
     ORDER BY day ASC
   `);
-  const settings = getSettings();
+  const settings = await getSettings();
   const ticketMedio = parseFloat(settings.emission_fee || 19.90) + parseFloat(settings.shipping_fee || 29.90);
 
   res.json({ total, paid, today, pending: total - paid, revenue: paid * ticketMedio, recent, profileStats, ticketMedio, leadsByDay });
-});
+}));
 
-app.get('/api/admin/leads', authMiddleware, (req, res) => {
+app.get('/api/admin/leads', authMiddleware, ah(async (req, res) => {
   const { search = '', page = 1, limit = 20 } = req.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
   const where = search ? `WHERE name LIKE '%${search}%' OR cpf LIKE '%${search}%'` : '';
-  const total = queryOne(`SELECT COUNT(*) as c FROM leads ${where}`)?.c || 0;
-  const leads = queryAll(`SELECT * FROM leads ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`, [parseInt(limit), offset]);
+  const total = (await queryOne(`SELECT COUNT(*) as c FROM leads ${where}`))?.c || 0;
+  const leads = await queryAll(`SELECT * FROM leads ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`, [parseInt(limit), offset]);
   res.json({ leads, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) });
-});
+}));
 
-app.delete('/api/admin/leads/:id', authMiddleware, (req, res) => {
-  execute('DELETE FROM leads WHERE id = ?', [req.params.id]);
+app.delete('/api/admin/leads/:id', authMiddleware, ah(async (req, res) => {
+  await execute('DELETE FROM leads WHERE id = ?', [req.params.id]);
   res.json({ success: true });
-});
+}));
 
-app.get('/api/admin/settings', authMiddleware, (req, res) => {
-  res.json(getSettings());
-});
+app.get('/api/admin/settings', authMiddleware, ah(async (req, res) => {
+  res.json(await getSettings());
+}));
 
-app.put('/api/admin/settings', authMiddleware, (req, res) => {
-  Object.entries(req.body).forEach(([k, v]) => {
-    execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [k, String(v)]);
-  });
+app.put('/api/admin/settings', authMiddleware, ah(async (req, res) => {
+  for (const [k, v] of Object.entries(req.body)) {
+    await execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [k, String(v)]);
+  }
   res.json({ success: true });
-});
+}));
 
-app.get('/api/admin/chats', authMiddleware, (req, res) => {
-  const sessions = queryAll(`
+app.get('/api/admin/chats', authMiddleware, ah(async (req, res) => {
+  const sessions = await queryAll(`
     SELECT session_id,
       MAX(created_at) as last_message,
       COUNT(*) as total_messages,
@@ -596,71 +559,70 @@ app.get('/api/admin/chats', authMiddleware, (req, res) => {
     FROM chat_messages GROUP BY session_id ORDER BY last_message DESC
   `);
 
-  const enriched = sessions.map(s => {
-    const lastMsg = queryOne('SELECT message, sender FROM chat_messages WHERE session_id = ? ORDER BY created_at DESC LIMIT 1', [s.session_id]);
-    const lead = queryOne('SELECT name FROM leads WHERE session_id = ? LIMIT 1', [s.session_id]);
+  const enriched = await Promise.all(sessions.map(async s => {
+    const lastMsg = await queryOne('SELECT message, sender FROM chat_messages WHERE session_id = ? ORDER BY created_at DESC LIMIT 1', [s.session_id]);
+    const lead = await queryOne('SELECT name FROM leads WHERE session_id = ? LIMIT 1', [s.session_id]);
     return { ...s, last_msg: lastMsg?.message || '', last_sender: lastMsg?.sender || '', lead_name: lead?.name || '' };
-  });
+  }));
 
   res.json(enriched);
-});
+}));
 
-app.get('/api/admin/chats/:sessionId', authMiddleware, (req, res) => {
-  const msgs = queryAll('SELECT * FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC', [req.params.sessionId]);
-  execute("UPDATE chat_messages SET read = 1 WHERE session_id = ? AND sender = 'user'", [req.params.sessionId]);
+app.get('/api/admin/chats/:sessionId', authMiddleware, ah(async (req, res) => {
+  const msgs = await queryAll('SELECT * FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC', [req.params.sessionId]);
+  await execute("UPDATE chat_messages SET read = 1 WHERE session_id = ? AND sender = 'user'", [req.params.sessionId]);
   res.json(msgs);
-});
+}));
 
-app.get('/api/stats', (req, res) => {
-  const settings = getSettings();
+app.get('/api/stats', ah(async (req, res) => {
+  const settings = await getSettings();
   const base = parseInt(settings.approved_today || 12847);
   res.json({ approvedToday: base + Math.floor(Math.random() * 10), onlineNow: Math.floor(Math.random() * 40) + 80 });
-});
+}));
 
-app.put('/api/admin/credentials', authMiddleware, (req, res) => {
+app.put('/api/admin/credentials', authMiddleware, ah(async (req, res) => {
   const { currentPassword, newUsername, newPassword } = req.body;
   if (!currentPassword) return res.status(400).json({ error: 'Senha atual obrigatória' });
 
-  const user = queryOne('SELECT * FROM admin_users WHERE id = ?', [req.user.id]);
+  const user = await queryOne('SELECT * FROM admin_users WHERE id = ?', [req.user.id]);
   if (!user || !bcrypt.compareSync(currentPassword, user.password)) {
     return res.status(401).json({ error: 'Senha atual incorreta' });
   }
 
   if (newUsername && newUsername !== user.username) {
-    const exists = queryOne('SELECT id FROM admin_users WHERE username = ? AND id != ?', [newUsername, req.user.id]);
+    const exists = await queryOne('SELECT id FROM admin_users WHERE username = ? AND id != ?', [newUsername, req.user.id]);
     if (exists) return res.status(400).json({ error: 'Nome de usuário já em uso' });
-    execute('UPDATE admin_users SET username = ? WHERE id = ?', [newUsername, req.user.id]);
+    await execute('UPDATE admin_users SET username = ? WHERE id = ?', [newUsername, req.user.id]);
   }
 
   if (newPassword) {
     if (newPassword.length < 6) return res.status(400).json({ error: 'Nova senha deve ter ao menos 6 caracteres' });
     const hashed = bcrypt.hashSync(newPassword, 10);
-    execute('UPDATE admin_users SET password = ? WHERE id = ?', [hashed, req.user.id]);
+    await execute('UPDATE admin_users SET password = ? WHERE id = ?', [hashed, req.user.id]);
   }
 
   res.json({ success: true });
-});
+}));
 
 app.get('/api/webhook-url', authMiddleware, (req, res) => {
   const base = process.env.API_BASE_URL || `http://localhost:${PORT}`;
   res.json({ url: `${base}/api/webhook/sigilopay` });
 });
 
-app.get('/api/site-config', (req, res) => {
-  const settings = getSettings();
+app.get('/api/site-config', ah(async (req, res) => {
+  const settings = await getSettings();
   try {
     const config = JSON.parse(settings.site_customization || '{}');
     res.json(config);
   } catch {
     res.json({});
   }
-});
+}));
 
-app.put('/api/admin/site-config', authMiddleware, (req, res) => {
-  execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', ['site_customization', JSON.stringify(req.body)]);
-  saveDB();
+app.put('/api/admin/site-config', authMiddleware, ah(async (req, res) => {
+  await execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', ['site_customization', JSON.stringify(req.body)]);
   res.json({ success: true });
-});
+}));
 
 // Upload de banner/imagem
 app.post('/api/admin/upload', authMiddleware, (req, res) => {
@@ -709,14 +671,16 @@ io.on('connection', (socket) => {
         message: `Olá, ${name?.split(' ')[0] || ''}! 👋 Posso te ajudar com sua solicitação de cartão?`,
         created_at: new Date().toISOString()
       };
-      execute('INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)', [sessionId, 'support', welcome.message]);
+      execute('INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)', [sessionId, 'support', welcome.message])
+        .catch(e => console.error('chat insert error:', e));
       socket.emit('receive_message', welcome);
     }, 1500);
   });
 
   socket.on('send_message', ({ sessionId, message, sender }) => {
     const msg = { session_id: sessionId, sender, message, created_at: new Date().toISOString() };
-    execute('INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)', [sessionId, sender, message]);
+    execute('INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)', [sessionId, sender, message])
+      .catch(e => console.error('chat insert error:', e));
 
     if (sender === 'user') {
       io.to('admin').emit('receive_message', msg);
