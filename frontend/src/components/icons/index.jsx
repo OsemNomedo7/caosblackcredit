@@ -22,33 +22,37 @@ function Icon({ size = 20, strokeWidth = 1.75, children, ...props }) {
 
 export function CardIcon(props) {
   return (
-    <Icon {...props}>
-      <rect x="2.5" y="5.5" width="19" height="13" rx="2.2" />
-      <path d="M2.5 9.7h19" />
-      <path d="M6 14.7h4" />
+    <Icon {...props} strokeWidth={2}>
+      <rect x="2.2" y="5" width="19.6" height="14" rx="3" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <rect x="2.2" y="5" width="19.6" height="14" rx="3" />
+      <rect x="2.2" y="9" width="19.6" height="3.2" fill="currentColor" stroke="none" />
+      <rect x="5.3" y="15" width="5.5" height="2" rx="1" fill="currentColor" stroke="none" />
+      <circle cx="17.3" cy="15.8" r="1.7" fill="currentColor" fillOpacity="0.55" stroke="none" />
     </Icon>
   );
 }
 
 export function RocketIcon(props) {
   return (
-    <Icon {...props}>
+    <Icon {...props} strokeWidth={2}>
+      <path d="M12 2c2.8 2 4 5.3 4 8.5 0 2-.5 4-1 5.5l-3 3-3-3c-.5-1.5-1-3.5-1-5.5C8 7.3 9.2 4 12 2Z" fill="currentColor" fillOpacity="0.16" stroke="none" />
       <path d="M12 2c2.8 2 4 5.3 4 8.5 0 2-.5 4-1 5.5l-3 3-3-3c-.5-1.5-1-3.5-1-5.5C8 7.3 9.2 4 12 2Z" />
-      <circle cx="12" cy="9.6" r="1.6" />
+      <circle cx="12" cy="9.6" r="1.8" fill="currentColor" stroke="none" />
       <path d="M8.2 15.6c-1.9.3-2.9 1.7-3.1 4.1 2.3 0 3.7-1 4.1-2.7" />
       <path d="M15.8 15.6c1.9.3 2.9 1.7 3.1 4.1-2.3 0-3.7-1-4.1-2.7" />
-      <path d="M10.3 18.6c0 1.4.6 2.7 1.7 3.5 1.1-.8 1.7-2.1 1.7-3.5" />
+      <path d="M10.4 19c.3 1.2.9 2.1 1.6 2.7.7-.6 1.3-1.5 1.6-2.7" fill="currentColor" fillOpacity="0.55" stroke="none" />
     </Icon>
   );
 }
 
 export function LockIcon(props) {
   return (
-    <Icon {...props}>
-      <rect x="5" y="11" width="14" height="9.5" rx="2" />
-      <path d="M8 11V7.8a4 4 0 0 1 8 0V11" />
-      <circle cx="12" cy="15.2" r="1.3" />
-      <path d="M12 16.5V18" />
+    <Icon {...props} strokeWidth={2}>
+      <rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" />
+      <path d="M7.7 10.5V7.6a4.3 4.3 0 0 1 8.6 0v2.9" />
+      <circle cx="12" cy="15.3" r="1.7" fill="currentColor" stroke="none" />
+      <path d="M12 16.8v2" strokeWidth="2.4" />
     </Icon>
   );
 }
@@ -66,19 +70,26 @@ export function UnlockIcon(props) {
 
 export function MoneyIcon(props) {
   return (
-    <Icon {...props}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.2v9.6" />
-      <path d="M14.6 9.3c-.4-.9-1.4-1.4-2.6-1.4-1.5 0-2.7.8-2.7 2s1.1 1.6 2.7 2c1.6.4 2.7 1 2.7 2.1 0 1.3-1.2 2-2.7 2-1.2 0-2.2-.5-2.6-1.4" />
+    <Icon {...props} strokeWidth={2}>
+      <circle cx="12" cy="12" r="9" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="6" strokeOpacity="0.45" />
+      <path d="M12 7.4v9.4" strokeWidth="2.3" />
+      <path d="M14.6 9.5c-.5-1-1.5-1.5-2.7-1.5-1.6 0-2.9.9-2.9 2.1s1.1 1.7 2.9 2.2c1.8.5 2.9 1.1 2.9 2.3 0 1.3-1.3 2.1-2.9 2.1-1.3 0-2.3-.5-2.8-1.5" strokeWidth="2.3" />
     </Icon>
   );
 }
 
 export function PhoneIcon(props) {
   return (
-    <Icon {...props}>
-      <rect x="7" y="2.3" width="10" height="19.4" rx="2.3" />
-      <path d="M10.8 19.2h2.4" />
+    <Icon {...props} strokeWidth={2}>
+      <rect x="6.5" y="2" width="11" height="20" rx="2.6" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <rect x="6.5" y="2" width="11" height="20" rx="2.6" />
+      <rect x="9" y="5.6" width="2.4" height="2.4" rx="0.6" fill="currentColor" stroke="none" />
+      <rect x="12.6" y="5.6" width="2.4" height="2.4" rx="0.6" fill="currentColor" fillOpacity="0.55" stroke="none" />
+      <rect x="9" y="9.3" width="2.4" height="2.4" rx="0.6" fill="currentColor" fillOpacity="0.55" stroke="none" />
+      <rect x="12.6" y="9.3" width="2.4" height="2.4" rx="0.6" fill="currentColor" stroke="none" />
+      <path d="M10.6 18.6h2.8" strokeWidth="2.4" />
     </Icon>
   );
 }
@@ -94,8 +105,9 @@ export function PhoneCallIcon(props) {
 export function SparkleIcon(props) {
   return (
     <Icon {...props} fill="currentColor" stroke="none">
-      <path d="M12 2.5l1.6 5.4 5.4 1.6-5.4 1.6L12 16.5l-1.6-5.4-5.4-1.6 5.4-1.6L12 2.5Z" />
-      <path d="M19 15.5l.8 2.5 2.5.8-2.5.8-.8 2.5-.8-2.5-2.5-.8 2.5-.8.8-2.5Z" />
+      <path d="M12 1.8l2 6.2 6.2 2-6.2 2L12 18.2l-2-6.2-6.2-2 6.2-2L12 1.8Z" />
+      <path d="M19.3 14.6l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z" fillOpacity="0.55" />
+      <circle cx="5" cy="17" r="1.3" fillOpacity="0.4" />
     </Icon>
   );
 }
@@ -208,10 +220,12 @@ export function TargetIcon(props) {
 
 export function ClipboardIcon(props) {
   return (
-    <Icon {...props}>
-      <rect x="6" y="4.5" width="12" height="16" rx="2" />
-      <rect x="9" y="3" width="6" height="3" rx="1" />
-      <path d="M9 11.2h6M9 14.7h6M9 18.2h4" />
+    <Icon {...props} strokeWidth={2}>
+      <rect x="5.3" y="4" width="13.4" height="17.5" rx="2.4" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <rect x="5.3" y="4" width="13.4" height="17.5" rx="2.4" />
+      <rect x="8.7" y="2.4" width="6.6" height="3" rx="1.1" fill="currentColor" stroke="none" />
+      <path d="M8.5 12.8l2 2 4-4.4" strokeWidth="2.3" />
+      <path d="M8.5 17h5.5" strokeWidth="2.2" strokeOpacity="0.5" />
     </Icon>
   );
 }
@@ -341,9 +355,11 @@ export function BulbIcon(props) {
 
 export function SearchIcon(props) {
   return (
-    <Icon {...props}>
-      <circle cx="10.5" cy="10.5" r="6.5" />
-      <path d="M19.5 19.5l-4.3-4.3" />
+    <Icon {...props} strokeWidth={2}>
+      <circle cx="10.8" cy="10.8" r="7.3" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <circle cx="10.8" cy="10.8" r="7.3" />
+      <path d="M20.5 20.5l-4.8-4.8" strokeWidth="2.6" />
+      <path d="M8.7 8.4a2.6 2.6 0 0 1 3.6-1" strokeOpacity="0.55" />
     </Icon>
   );
 }
@@ -427,9 +443,11 @@ export function LinkIcon(props) {
 
 export function UserIcon(props) {
   return (
-    <Icon {...props}>
-      <circle cx="12" cy="8.3" r="3.8" />
-      <path d="M4.5 20c1-3.8 4-5.8 7.5-5.8s6.5 2 7.5 5.8" />
+    <Icon {...props} strokeWidth={2}>
+      <path d="M4.2 20.2c1-4 4.1-6.1 7.8-6.1s6.8 2.1 7.8 6.1" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <circle cx="12" cy="8" r="4.3" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <circle cx="12" cy="8" r="4.3" />
+      <path d="M4.2 20.2c1-4 4.1-6.1 7.8-6.1s6.8 2.1 7.8 6.1" />
     </Icon>
   );
 }
@@ -586,11 +604,12 @@ export function DotRingIcon(props) {
 
 export function PackageIcon(props) {
   return (
-    <Icon {...props}>
-      <path d="M12 3 20.5 7.5v9L12 21 3.5 16.5v-9L12 3Z" />
-      <path d="M3.8 7.4 12 12l8.2-4.6" />
-      <path d="M12 12v9" />
-      <path d="M16.2 5.2 8 9.8" />
+    <Icon {...props} strokeWidth={2}>
+      <path d="M12 2.4 21 7.2v9.6L12 21.6 3 16.8V7.2L12 2.4Z" fill="currentColor" fillOpacity="0.16" stroke="none" />
+      <path d="M12 2.4 21 7.2v9.6L12 21.6 3 16.8V7.2L12 2.4Z" />
+      <path d="M3.4 7.2 12 12l8.6-4.8" />
+      <path d="M12 12v9.6" />
+      <path d="M16.4 4.8 7.7 9.6" strokeOpacity="0.55" />
     </Icon>
   );
 }

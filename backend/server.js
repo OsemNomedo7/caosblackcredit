@@ -152,6 +152,21 @@ async function initDB() {
   }
 
   // Configurações padrão
+  const DEFAULT_BENEFICIOS = [
+    { icon: 'card', titulo: 'Cartão físico Mastercard', desc: 'Aceito em todo o Brasil e no exterior' },
+    { icon: 'rocket', titulo: 'Aprovação em minutos', desc: 'Análise automatizada, sem burocracia' },
+    { icon: 'lock', titulo: 'Sem consulta SPC/Serasa', desc: 'Negativados são bem-vindos aqui' },
+    { icon: 'money', titulo: 'Até R$2.000 de limite', desc: 'Limite real para suas compras do dia a dia' },
+    { icon: 'phone', titulo: 'Controle pelo app', desc: 'Gerencie tudo pelo celular, 24h por dia' },
+    { icon: 'sparkle', titulo: 'Sem anuidade no 1º ano', desc: 'Sem surpresas na fatura do cartão' },
+  ];
+  const DEFAULT_PASSOS = [
+    { icon: 'user', numero: '01', titulo: 'Escolha seu perfil', desc: 'Selecione se já é cliente ou se está negativado' },
+    { icon: 'clipboard', numero: '02', titulo: 'Informe seus dados', desc: 'Apenas nome e CPF. Rápido e seguro.' },
+    { icon: 'search', numero: '03', titulo: 'Análise imediata', desc: 'Seu score é calculado em segundos' },
+    { icon: 'package', numero: '04', titulo: 'Receba seu cartão', desc: 'Pague a taxa e receba em casa em até 7 dias' },
+  ];
+
   const defaults = [
     ['emission_fee', '19.90'],
     ['shipping_fee', '29.90'],
@@ -194,20 +209,8 @@ async function initDB() {
         ctaPrincipal: 'Quero meu cartão agora', ctaSecundario: 'Ver como funciona',
         badgeAprovados: 'aprovados hoje', badgeSemConsulta: 'Sem consulta SPC', badgeAprovacao: 'Aprovação imediata',
       },
-      beneficios: [
-        { icon: 'card', titulo: 'Cartão físico Mastercard', desc: 'Aceito em todo o Brasil e no exterior' },
-        { icon: 'rocket', titulo: 'Aprovação em minutos', desc: 'Análise automatizada, sem burocracia' },
-        { icon: 'lock', titulo: 'Sem consulta SPC/Serasa', desc: 'Negativados são bem-vindos aqui' },
-        { icon: 'money', titulo: 'Até R$2.000 de limite', desc: 'Limite real para suas compras do dia a dia' },
-        { icon: 'phone', titulo: 'Controle pelo app', desc: 'Gerencie tudo pelo celular, 24h por dia' },
-        { icon: 'sparkle', titulo: 'Sem anuidade no 1º ano', desc: 'Sem surpresas na fatura do cartão' },
-      ],
-      passos: [
-        { icon: 'user', numero: '01', titulo: 'Escolha seu perfil', desc: 'Selecione se já é cliente ou se está negativado' },
-        { icon: 'clipboard', numero: '02', titulo: 'Informe seus dados', desc: 'Apenas nome e CPF. Rápido e seguro.' },
-        { icon: 'search', numero: '03', titulo: 'Análise imediata', desc: 'Seu score é calculado em segundos' },
-        { icon: 'package', numero: '04', titulo: 'Receba seu cartão', desc: 'Pague a taxa e receba em casa em até 7 dias' },
-      ],
+      beneficios: DEFAULT_BENEFICIOS,
+      passos: DEFAULT_PASSOS,
       depoimentos: [
         { nome: 'Maria S.', texto: 'Estava negativada há 3 anos e consegui meu cartão em 10 minutos. Incrível!', nota: 5, cidade: 'São Paulo, SP' },
         { nome: 'João P.', texto: 'Tentei em vários lugares e fui recusado. Aqui foi aprovado na hora!', nota: 5, cidade: 'Rio de Janeiro, RJ' },
@@ -234,6 +237,35 @@ async function initDB() {
   ];
   for (const [k, v] of defaults) {
     await execute('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', [k, v]);
+  }
+
+  // Migração: corrige o ícone de cada benefício/passo em configs salvas antes
+  // dessa mudança (INSERT OR IGNORE não atualiza uma linha já existente).
+  // Só mexe no campo "icon" — preserva títulos/descrições já customizados.
+  const savedCustom = await queryOne("SELECT value FROM settings WHERE key = 'site_customization'");
+  if (savedCustom) {
+    try {
+      const cfg = JSON.parse(savedCustom.value);
+      let changed = false;
+
+      if (Array.isArray(cfg.beneficios) && cfg.beneficios.length === DEFAULT_BENEFICIOS.length) {
+        cfg.beneficios = cfg.beneficios.map((b, i) => {
+          if (b.icon !== DEFAULT_BENEFICIOS[i].icon) { changed = true; return { ...b, icon: DEFAULT_BENEFICIOS[i].icon }; }
+          return b;
+        });
+      }
+      if (Array.isArray(cfg.passos) && cfg.passos.length === DEFAULT_PASSOS.length) {
+        cfg.passos = cfg.passos.map((p, i) => {
+          if (p.icon !== DEFAULT_PASSOS[i].icon) { changed = true; return { ...p, icon: DEFAULT_PASSOS[i].icon }; }
+          return p;
+        });
+      }
+
+      if (changed) {
+        await execute("UPDATE settings SET value = ? WHERE key = 'site_customization'", [JSON.stringify(cfg)]);
+        console.log('🔧 Ícones de benefícios/passos migrados para o novo padrão');
+      }
+    } catch { /* customização inválida, ignora */ }
   }
 }
 

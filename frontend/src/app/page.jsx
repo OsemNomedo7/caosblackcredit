@@ -356,7 +356,7 @@ export default function LandingPage() {
                 <div className="rounded-2xl p-6 text-center h-full" style={{ background: c.cardBg || 'rgba(255,255,255,0.85)', border: `1px solid ${c.cardBorda || 'rgba(130,10,209,0.12)'}`, backdropFilter: 'blur(8px)' }}>
                   {(() => {
                     const StepIcon = STEP_ICONS[s.icon] || ClipboardIcon;
-                    return <div className="mb-4" style={{ color: c.primaria || '#820AD1' }}><StepIcon size={32} strokeWidth={1.5} /></div>;
+                    return <div className="mb-4 flex justify-center" style={{ color: c.primaria || '#820AD1' }}><StepIcon size={32} strokeWidth={1.5} /></div>;
                   })()}
                   <div className="text-xs font-bold tracking-widest mb-2" style={{ color: c.primaria || '#820AD1' }}>{s.numero || s.n}</div>
                   <h3 className="font-bold mb-2" style={{ color: c.textoTitulo || '#111827' }}>{s.titulo || s.title}</h3>
