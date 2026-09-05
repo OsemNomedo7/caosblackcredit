@@ -287,6 +287,21 @@ async function fetchGeolocation(ip) {
 }
 
 // ─── SIGILOPAY ────────────────────────────────────────────────────────────────
+// Verifica se uma string base64 corresponde a uma imagem PNG/JPEG/GIF real
+// (evita renderizar um <img> quebrado quando o gateway manda o EMV em base64)
+function isImageBase64(str) {
+  try {
+    const buf = Buffer.from(String(str).replace(/^base64,/, ''), 'base64');
+    if (buf.length < 8) return false;
+    const png = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+    const jpg = buf[0] === 0xff && buf[1] === 0xd8;
+    const gif = buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46;
+    return png || jpg || gif;
+  } catch {
+    return false;
+  }
+}
+
 async function gerarPixSigiloPay(settings, total, lead) {
   const pub = settings.sigilopay_public_key;
   const sec = settings.sigilopay_secret_key;
@@ -421,20 +436,50 @@ app.post('/api/pix/generate', ah(async (req, res) => {
   // Tenta SigiloPay primeiro
   try {
     const sigiloData = await gerarPixSigiloPay(settings, total, lead);
-    if (sigiloData && sigiloData.pix && sigiloData.pix.code) {
-      const b64 = sigiloData.pix.base64 || '';
-      const qrCode = b64 ? (b64.startsWith('data:') ? b64 : `data:image/png;base64,${b64}`) : null;
+
+    // O gateway pode devolver o código PIX em chaves diferentes conforme a versão da API
+    const pix = sigiloData?.pix || sigiloData?.data?.pix || sigiloData || {};
+    const pixCode =
+      pix.code || pix.payload || pix.copyPaste || pix.qrcode || pix.emv ||
+      sigiloData?.pixCode || sigiloData?.qrCodeText || sigiloData?.brcode || '';
+
+    if (sigiloData && pixCode) {
+      // Imagem do QR Code: usa a que o gateway enviar; se não vier, gera a partir do código
+      const rawImg =
+        pix.base64 || pix.qrCodeBase64 || pix.imageBase64 || pix.qrCodeImage ||
+        sigiloData?.qrCodeImage || sigiloData?.qrCodeBase64 || '';
+      let qrCode = null;
+      if (rawImg && rawImg.startsWith('data:image')) {
+        qrCode = rawImg;
+      } else if (rawImg && isImageBase64(rawImg)) {
+        qrCode = `data:image/png;base64,${rawImg}`;
+      }
+
+      if (!qrCode) {
+        try {
+          qrCode = await QRCode.toDataURL(pixCode, {
+            width: 260, margin: 1, color: { dark: '#1a0533', light: '#ffffff' },
+          });
+        } catch (e) {
+          console.error('Falha ao gerar QR Code do PIX SigiloPay:', e);
+        }
+      }
+
       return res.json({
-        pixCode: sigiloData.pix.code,
+        pixCode,
         qrCode,
         amount: total,
         emission_fee,
         shipping_fee,
-        transactionId: sigiloData.transactionId || '',
+        transactionId: sigiloData.transactionId || sigiloData?.data?.transactionId || '',
         gateway: 'sigilopay',
       });
     }
-  } catch { /* fallback para PIX local */ }
+
+    console.warn('SigiloPay: resposta sem código PIX, usando fallback local. Resposta:', JSON.stringify(sigiloData));
+  } catch (e) {
+    console.error('SigiloPay: erro na geração, usando fallback local:', e);
+  }
 
   // Fallback: PIX local
   const pixPayload = gerarPixSimples(settings.pix_key || '11999999999', settings.beneficiary_name || 'CARTAO PREMIUM', total);
