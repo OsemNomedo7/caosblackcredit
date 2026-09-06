@@ -35,7 +35,7 @@ export default function EmissaoPage() {
     }
 
     // Gera PIX
-    generatePix({ amount: 34.80, leadId: id ? parseInt(id) : undefined })
+    generatePix({ amount: 49.80, leadId: id ? parseInt(id) : undefined })
       .then(data => { setPix(data); setLoading(false); })
       .catch(() => {
         // Fallback com QR code simulado
@@ -43,8 +43,8 @@ export default function EmissaoPage() {
           pixCode: '00020126580014BR.GOV.BCB.PIX0136a1b2c3d4-e5f6-7890-abcd-ef1234567890520400005303986540549.805802BR5925CARTAO PREMIUM DIGITAL6009SAO PAULO62070503***63041A2B',
           qrCode: null,
           amount: 34.80,
-          emission_fee: 19.90,
-          shipping_fee: 14.90,
+          emission_fee: 29.90,
+          shipping_fee: 19.90,
         });
         setLoading(false);
       });
