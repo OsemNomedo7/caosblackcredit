@@ -181,7 +181,7 @@ export default function EmissaoPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white/40 text-xs tracking-widest mb-1">LIMITE</p>
-                  <p className="text-green-400 font-bold text-xl">R$ 2.000</p>
+                  <p className="text-green-400 font-bold text-xl">R$ 5.000</p>
                 </div>
               </div>
             </div>
