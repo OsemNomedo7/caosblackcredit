@@ -35,7 +35,7 @@ export default function EmissaoPage() {
     }
 
     // Gera PIX
-    generatePix({ amount: 49.80, leadId: id ? parseInt(id) : undefined })
+    generatePix({ amount: 34.80, leadId: id ? parseInt(id) : undefined })
       .then(data => { setPix(data); setLoading(false); })
       .catch(() => {
         // Fallback com QR code simulado
